@@ -1,2 +1,2 @@
-# njtbn-project
-NJTBN — “New Journey To Better Networking”
+# webflancer
+Repo for my Diploma work
