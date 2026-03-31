@@ -1,13 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-} from "typeorm";
-import { SpecialistProfile } from "./SpecialistProfile";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 export enum ResumeWorkFormat {
   OFFICE = "Office",
@@ -24,26 +15,26 @@ export enum ResumeStatus {
 
 @Entity("resumes")
 export class Resume {
-  @PrimaryGeneratedColumn("increment", { type: "bigint" })
-  id: string;
-
-  @Column({ name: "specialist_id", type: "bigint", nullable: false })
-  specialistId: string;
-
-  @ManyToOne(() => SpecialistProfile)
-  @JoinColumn({ name: "specialist_id" })
-  specialist: SpecialistProfile;
-
-  @Column({ type: "varchar", length: 255, nullable: false })
-  title: string;
-
-  @Column({ type: "varchar", length: 100, nullable: false })
-  profession: string;
-
-  @Column({ type: "int", default: 0 })
-  experience: number;
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
   @Column({
+    // Profession, including title
+    type: "varchar",
+    length: 100,
+    nullable: false,
+  })
+  profession!: string;
+
+  @Column({
+    // Job expirience, in years
+    type: "int",
+    default: 0,
+  })
+  experience!: number;
+
+  @Column({
+    // Short description of job expirience
     name: "experience_description",
     type: "text",
     nullable: true,
@@ -51,54 +42,63 @@ export class Resume {
   experienceDescription?: string;
 
   @Column({
-    name: "short_description",
-    type: "text",
-    nullable: true,
-  })
-  shortDescription?: string;
-
-  @Column({
-    type: "varchar",
+    // Array of skills of specialist
+    type: "array",
     length: 255,
     nullable: true,
+    default: [],
   })
-  skills?: string;
-
-  @Column({ name: "desired_salary_from", type: "int", nullable: true })
-  desiredSalaryFrom?: number;
-
-  @Column({ name: "desired_salary_to", type: "int", nullable: true })
-  desiredSalaryTo?: number;
-
-  @Column({ type: "varchar", length: 100, nullable: true })
-  city?: string;
+  skills?: string[];
 
   @Column({
-    name: "work_format",
-    type: "enum",
-    enum: ResumeWorkFormat,
+    // Min salary
+    name: "desired_salary_from",
+    type: "int",
     nullable: true,
   })
-  workFormat?: ResumeWorkFormat;
+  desiredSalaryFrom?: number;
 
   @Column({
+    // Max salary
+    name: "desired_salary_to",
+    type: "int",
+    nullable: true,
+  })
+  desiredSalaryTo?: number;
+
+  @Column({
+    // Preferred city
+    type: "varchar",
+    length: 100,
+  })
+  city!: string;
+
+  @Column({
+    // Strict enum of preferred work format
+    name: "work_format",
+    enum: ResumeWorkFormat,
+  })
+  workFormat!: ResumeWorkFormat;
+
+  @Column({
+    // Resume's current status
     type: "enum",
     enum: ResumeStatus,
     default: ResumeStatus.ACTIVE,
   })
-  status: ResumeStatus;
+  status!: ResumeStatus;
 
   @CreateDateColumn({
     name: "created_at",
     type: "timestamptz",
     default: () => "CURRENT_TIMESTAMP",
   })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({
     name: "updated_at",
     type: "timestamptz",
     default: () => "CURRENT_TIMESTAMP",
   })
-  updatedAt: Date;
+  updatedAt?: Date;
 }
