@@ -59,6 +59,15 @@ export class User {
   @Column({ type: "varchar", length: 100, nullable: true }) //City, optional, check on server side
   city?: string;
 
+  @Column({
+    // Array of socials
+    name: "social_links",
+    type: "array",
+    nullable: true,
+    default: [],
+  })
+  socialLinks?: string[];
+
   @CreateDateColumn({
     name: "created_at",
     type: "timestamptz",
@@ -140,15 +149,6 @@ export class Employer extends User {
     nullable: true,
   })
   description?: string;
-
-  @Column({
-    // Array of socials
-    name: "social_links",
-    type: "array",
-    nullable: true,
-    default: [],
-  })
-  socialLinks?: string[];
 
   @Column({
     // Birthdate
