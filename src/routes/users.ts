@@ -1,5 +1,13 @@
 import { FastifyInstance } from "fastify";
-import { Specialist, Employer, Role, User } from "../entities/User";
+import {
+  Specialist,
+  Employer,
+  Role,
+  User,
+  Gender,
+  ProfileStatus,
+  EducationLevel,
+} from "../entities/User";
 // noinspection ES6UnusedImports
 import { fastifyCookie } from "@fastify/cookie";
 import { Database } from "../datasource";
@@ -16,19 +24,10 @@ const signupSchema = {
       phone: { type: "string", pattern: "^89\\d{9}$" }, // Strict 89xxxxxxxxx
       password: { type: "string", minLength: 8 },
       // Employer specific
-      tin: { type: "number", minLength: 10, maxLength: 12 },
+      tin: { type: "string", minLength: 10, maxLength: 12 },
     },
   },
 };
-
-interface signupBody {
-  name: string;
-  surname: string;
-  email: string;
-  phone: string;
-  password: string;
-  tin?: string;
-}
 
 const loginSchema = {
   body: {
@@ -40,12 +39,78 @@ const loginSchema = {
   },
 };
 
+const updateSchema = {
+  body: {
+    type: "object",
+    required: ["phone", "gender", "city"],
+    properties: {
+      phone: { type: "string", pattern: "^89\\d{9}$" },
+      gender: {
+        type: "string",
+        enum: Object.values(Gender),
+      },
+      city: { type: "string", minLength: 2, maxLength: 100 },
+      socialLinks: {
+        type: "array",
+        items: { type: "string", format: "uri" },
+      },
+      // Employer specific
+      managerPosition: { type: "string", maxLength: 150 },
+      companyName: { type: "string", maxLength: 255 },
+      companyWebsite: {
+        type: "string",
+        pattern:
+          "^https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)$",
+      },
+      // Specialist specific
+      educations: {
+        type: "array",
+        items: {
+          type: "string",
+          enum: Object.values(EducationLevel),
+        },
+      },
+      status: {
+        type: "string",
+        enum: Object.values(ProfileStatus),
+      },
+      description: { type: "string" },
+      birthDate: { type: "string", format: "date" }, // Validates "YYYY-MM-DD"
+      citizenship: { type: "boolean" },
+    },
+  },
+};
+
+interface updateBody {
+  phone: string;
+  gender: string;
+  city: string;
+  socialLinks: [];
+  managerPosition?: string;
+  companyName?: string;
+  companyWebsite?: string;
+  educations?: [];
+  status?: string;
+  description?: string;
+  birthDate?: Date;
+  citizenship?: boolean;
+}
+
+interface signupBody {
+  name: string;
+  surname: string;
+  email: string;
+  phone: string;
+  password: string;
+  tin?: number;
+}
+
 interface userParams {
   id: string;
   role: Role;
 }
 
-export default async (fastify: FastifyInstance) => {
+module.exports = async (fastify: FastifyInstance) => {
   fastify.post<{ Params: userParams; Body: signupBody }>(
     "/signup/:role",
     { schema: signupSchema },
@@ -103,6 +168,7 @@ export default async (fastify: FastifyInstance) => {
       }
     },
   );
+
   fastify.post("/login", { schema: loginSchema }, async (req, res) => {
     const data = req.body as any;
     const userRepository = Database.getRepository(User);
@@ -125,11 +191,31 @@ export default async (fastify: FastifyInstance) => {
       .status(200)
       .send({ success: true, message: `Login successfull` });
   });
+
+  fastify.post("/logout", { preHandler: fastify.authenticate }, async (req, res) => {
+    try {
+      if (!req.cookies.access_token) {
+        return res.status(400).send({ success: false, message: "No cookies provided" });
+      }
+      res
+        .clearCookie("access_token", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+          signed: true,
+          path: "/",
+        })
+        .status(200)
+        .send({ success: true, message: "Logged out" });
+    } catch (e) {
+      console.log(e);
+      return res.status(500).send({ success: false, message: "Internal server error" });
+    }
+  });
+
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
     const userRepository = Database.getRepository(User);
     let user;
-    console.log(req.user.id);
-    console.log(req.params.id);
     try {
       user = await userRepository.findOne({ where: { id: req.params.id } });
     } catch (e) {
@@ -179,4 +265,42 @@ export default async (fastify: FastifyInstance) => {
       });
     }
   });
+
+  fastify.patch<{ Body: updateBody }>(
+    "/update",
+    { preHandler: fastify.authenticate, schema: updateSchema },
+    async (req, res) => {
+      const userRepository = Database.getRepository(User);
+      const user = await userRepository.findOne({ where: { id: req.user.id } });
+
+      if (!user) {
+        return res.status(404).send({ success: false, message: "User not found" });
+      }
+
+      const updateData: any = req.body;
+      switch (user.role) {
+        case Role.EMPLOYER:
+          delete updateData.educations;
+          delete updateData.status;
+          delete updateData.description;
+          delete updateData.birthDate;
+          delete updateData.citizenship;
+          break;
+        case Role.SPECIALIST:
+          delete updateData.managerPosition;
+          delete updateData.companyName;
+          delete updateData.companyWebsite;
+          break;
+      }
+      Object.assign(user, updateData);
+
+      try {
+        await userRepository.save(user);
+        return res.status(200).send({ success: true, message: "Successfully Updated" });
+      } catch (err) {
+        console.log(err);
+        return res.status(500).send({ success: false, message: "Database Error" });
+      }
+    },
+  );
 };
