@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Relation,
+} from "typeorm";
+import { Specialist } from "./User";
 
 export enum ResumeWorkFormat {
   OFFICE = "Office",
@@ -17,6 +27,16 @@ export enum ResumeStatus {
 export class Resume {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
+
+  @Column({ name: "specialist_id", nullable: true })
+  specialistId?: string | null;
+
+  @ManyToOne(() => Specialist, (specialist) => specialist.resumes)
+  // One employer can manage multiple vacancies, but one vacancy can have only one manager
+  @JoinColumn({
+    name: "specialist_id",
+  })
+  specialist?: Relation<Specialist>;
 
   @Column({
     // Profession, including title
@@ -43,10 +63,10 @@ export class Resume {
 
   @Column({
     // Array of skills of specialist
-    type: "array",
-    length: 255,
+    type: "text",
+    array: true,
     nullable: true,
-    default: [],
+    default: "{}",
   })
   skills?: string[];
 
@@ -87,6 +107,12 @@ export class Resume {
     default: ResumeStatus.ACTIVE,
   })
   status!: ResumeStatus;
+
+  @Column({
+    type: "int",
+    default: 0,
+  })
+  views!: number;
 
   @CreateDateColumn({
     name: "created_at",

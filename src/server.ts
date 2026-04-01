@@ -6,7 +6,7 @@ import fastifyCookie from "@fastify/cookie";
 import helmet from "@fastify/helmet";
 
 const server = fastify({
-  trustProxy: true,
+  // trustProxy: true,
   logger: true,
 });
 console.log("Server started");
@@ -47,11 +47,13 @@ server.register(cors, {
 
 server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply) => {
   try {
-    await req.jwtVerify();
+    req.user = await req.jwtVerify();
   } catch {
     return reply.status(401).send({ message: "Unauthorized" });
   }
 });
+
+server.register(require("./routes/users"), { prefix: "/api/users" });
 
 const start = async () => {
   try {

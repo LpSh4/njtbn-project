@@ -5,13 +5,24 @@ import {
   TableInheritance,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
+  Relation,
+  ChildEntity,
 } from "typeorm";
+import type { Vacancy } from "./Vacancy";
+import type { Resume } from "./Resume";
+import type { Application } from "./Application";
 
 export enum Gender {
   MALE = "male",
   FEMALE = "female",
   NOT_SPECIFIED = "notSpecified",
   OTHER = "other",
+}
+
+export enum Role {
+  EMPLOYER = "employer",
+  SPECIALIST = "specialist",
 }
 
 export enum ProfileStatus {
@@ -35,6 +46,9 @@ export enum EducationLevel {
 export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
+
+  @Column() // Add this to make it accessible in code
+  role!: Role;
 
   @Column() //Username
   name!: string;
@@ -60,11 +74,12 @@ export class User {
   city?: string;
 
   @Column({
-    // Array of socials
+    // Array of social links
     name: "social_links",
-    type: "array",
+    type: "text",
+    array: true,
     nullable: true,
-    default: [],
+    default: "{}",
   })
   socialLinks?: string[];
 
@@ -83,8 +98,8 @@ export class User {
   updatedAt?: Date;
 }
 
-@Entity()
-export class Specialist extends User {
+@ChildEntity(Role.EMPLOYER)
+export class Employer extends User {
   @Column({
     //Tax Identification Number, strict check before sending here
     type: "varchar",
@@ -125,15 +140,20 @@ export class Specialist extends User {
     nullable: true,
   })
   companyWebsite?: string;
+
+  @OneToMany("Vacancy", (vacancy: Vacancy) => vacancy.manager)
+  vacancies?: Relation<Vacancy[]>;
 }
 
-@Entity()
-export class Employer extends User {
+@ChildEntity(Role.SPECIALIST)
+export class Specialist extends User {
   @Column({
-    // Array of educational levels, strictly enum, for filtering
+    // Array of education levels, enums
+    type: "enum",
+    enum: EducationLevel,
+    array: true,
     nullable: true,
-    type: "array",
-    default: [EducationLevel.SECONDARY_VOCATIONAL],
+    default: `{${EducationLevel.SECONDARY_VOCATIONAL}}`,
   })
   educations?: EducationLevel[];
 
@@ -163,4 +183,10 @@ export class Employer extends User {
     default: true,
   })
   citizenship!: boolean;
+
+  @OneToMany("Application", (app: Application) => app.applicant)
+  applications!: Relation<Application[]>;
+
+  @OneToMany("Resume", (resume: Resume) => resume.specialist)
+  resumes?: Relation<Resume[]>;
 }

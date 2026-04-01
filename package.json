@@ -21,7 +21,7 @@
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
-    "dev": "node --watch server.js",
+    "dev": "node --watch dist/server.js",
     "build": "tsc -p tsconfig.json --watch"
   },
   "dependencies": {
@@ -33,6 +33,7 @@
     "@types/node": "^25.5.0",
     "bcrypt": "^6.0.0",
     "fastify": "^5.8.4",
+    "pg": "^8.20.0",
     "ts-node": "^10.9.2",
     "typeorm": "^0.3.28",
     "typescript": "^6.0.2"

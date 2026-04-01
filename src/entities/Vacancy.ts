@@ -1,4 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Relation,
+  OneToMany,
+} from "typeorm";
+import { Employer } from "./User";
+import { Application } from "./Application";
 
 export enum WorkSchedule {
   SIX_ONE = "6/1",
@@ -50,6 +62,16 @@ export enum VacancyStatus {
 export class Vacancy {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
+
+  @Column({ name: "manager_id", nullable: true })
+  managerId?: string | null;
+
+  @ManyToOne(() => Employer, (manager) => manager.vacancies)
+  // One employer can manage multiple vacancies, but one vacancy can have only one manager
+  @JoinColumn({
+    name: "manager_id",
+  })
+  manager?: Relation<Employer>;
 
   @Column({
     // Vacancy title (Should include the job title, etc)
@@ -135,9 +157,10 @@ export class Vacancy {
   @Column({
     // Array of required skills. Just for observation, for now
     name: "required_skills",
-    type: "array",
-    length: 255,
+    type: "text",
+    array: true,
     nullable: true,
+    default: "{}",
   })
   requiredSkills?: string[];
 
@@ -155,6 +178,15 @@ export class Vacancy {
     nullable: true,
   })
   closedAt?: Date;
+
+  @Column({
+    type: "int",
+    default: 0,
+  })
+  views!: number;
+
+  @OneToMany(() => Application, (app) => app.vacancy)
+  applications!: Relation<Application[]>;
 
   @CreateDateColumn({
     name: "created_at",
