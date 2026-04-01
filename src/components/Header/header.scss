@@ -1,0 +1,28 @@
+@use "../../styles/mixins";
+
+.header{
+  padding: 10px 52px;
+  @include mixins.flex(row,space-between,center,wrap);
+  background-color: #3914AF;
+
+  &__logo{
+    @include mixins.flex();
+   column-gap: 16px;
+  }
+
+  &__img{
+    padding-right: 16px ;
+    border-right: solid 1px white ;
+  }
+
+
+
+  &__nav{
+    @include mixins.flex()
+  }
+
+  &__list{
+    @include mixins.flex();
+    column-gap: 19px;
+  }
+}
