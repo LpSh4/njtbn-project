@@ -1,0 +1,109 @@
+@use "../../styles/mixins";
+
+.filter{
+  @include mixins.flex();
+  background-image:
+          linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+          url("img/background-image-office-workers.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  min-height: 820px;
+
+
+  &__form{
+    padding: 0 80px 0 80px;
+    @include mixins.flex(column, center, stretch);
+    gap: 69px;
+    width: 100%;
+
+    h2{
+      font-size: 52px;
+      text-align: center;
+      @media (max-width: 540px) {
+        font-size: 32px;
+      }
+    }
+  }
+  &__input{
+    @include mixins.flex();
+    column-gap: 49px;
+    @media (max-width: 768px) {
+      @include mixins.flex(column);
+      gap: 20px;
+
+    }
+
+    button{
+      padding: 11px 59px;
+      background-color:#3914AF;
+      border-radius: 22px;
+
+    }
+  }
+
+  &__search{
+    padding: 10px;
+    color: #000000;
+    max-width: 700px;
+    width: 100%;
+    height: 44px;
+    border-radius: 22px;
+  }
+
+}
+
+.popular{
+  margin-top: 61px;
+  padding: 0 0 0 160px;
+  @include mixins.flex(column,center,start);
+  row-gap: 47px;
+
+  @media (max-width: 1440px) {
+    padding: 0 90px 0 90px;
+  }
+
+  @media (max-width: 1240px) {
+    padding: 0 90px 0 90px;
+  }
+  @media (max-width: 1024px) {
+    padding: 0 90px 0 90px;
+  }
+  &__title{
+    @include mixins.flex();
+    column-gap: 18px;
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+    h2{
+      font-size: 40px;
+      color: #000000;
+    }
+  }
+
+  &__card-cont{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit,485px);
+    column-gap: 98px;
+    row-gap: 48px;
+
+    @media (max-width: 1800px) {
+      grid-template-columns: repeat(auto-fit,540px);
+    }
+
+    @media (max-width: 1340px) {
+      grid-template-columns: repeat(auto-fit,785px);
+    }
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(auto-fit, 70%);
+      justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(auto-fit, 300px);
+    }
+  }
+}

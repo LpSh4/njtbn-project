@@ -1,0 +1,66 @@
+@use "../../styles/mixins";
+
+.job-card{
+  padding:26px 26px 26px 19px;
+  @include mixins.flex(column,center,star);
+  box-shadow: 0 0 5px 0 black;
+  border-radius:39px;
+  gap: 21px;
+  @media (max-width: 768px) {
+    @include mixins.flex(column,center,center);
+  }
+
+  &__description{
+    @include mixins.flex(column,start,start);
+    gap: 11px;
+    @media (max-width: 768px) {
+      @include mixins.flex(column,center,center);
+
+    }
+
+    p{
+      font-size: 25px;
+      color:rgba(000,000,000,0.5);
+      @media (max-width: 768px) {
+        font-size: 16px;
+      }
+    }
+
+  }
+
+  &__text{
+    @include mixins.flex(column,start,start);
+    gap: 14px;
+    @media (max-width: 768px) {
+      @include mixins.flex(column,center,center);
+
+    }
+    h2{
+      font-weight: 600;
+      font-size: 30px;
+      color: #000000;
+      @media (max-width: 768px) {
+        text-align: center;
+      }
+    }
+
+    p{
+      font-size: 30px;
+      color: #000000;
+      @media (max-width: 768px) {
+        font-size: 25px;
+      }
+    }
+  }
+
+  &__btn-cont{
+    @include mixins.flex(row,end,center);
+  }
+
+  &__btn{
+    width: 182px;
+    height: 46px;
+    background-color: #3914AF;
+    border-radius: 23px;
+  }
+}

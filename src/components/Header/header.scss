@@ -8,6 +8,13 @@
   &__logo{
     @include mixins.flex();
    column-gap: 16px;
+
+
+  }
+
+  &__url{
+    @include mixins.flex(row,center,center,wrap);
+    column-gap: 27px;
   }
 
   &__img{

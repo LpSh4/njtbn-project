@@ -6,3 +6,8 @@
   flex-wrap: $wrap;
 }
 
+@mixin grid($min, $max: 250px, $gap: 20px) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min, $max));
+  gap: $gap;
+}

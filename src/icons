@@ -1,0 +1,11 @@
+ <ul className="header__list">
+                    <li className="header__list-item">
+                        <a href=""><img style={{ width: "25px" }} src={bell} alt="" /></a>
+                    </li>
+                    <li className="header__list-item">
+                        <a href=""><img style={{ width: "25px" }} src={fav} alt="" /></a>
+                    </li>
+                    <li className="header__list-item">
+                        <a href=""><img style={{ width: "25px" }} src={chat} alt="" /></a>
+                    </li>
+                </ul>
