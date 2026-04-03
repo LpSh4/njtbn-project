@@ -226,6 +226,7 @@ module.exports = async (fastify: FastifyInstance) => {
       name: user.name,
       surname: user.surname,
       email: user.email,
+      phone: user.phone,
       gender: user.gender,
       description: user.description,
       socialLinks: user.socialLinks,

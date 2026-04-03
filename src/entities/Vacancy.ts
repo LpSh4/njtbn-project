@@ -46,16 +46,16 @@ export enum WorkingHours {
 }
 
 export enum WorkFormat {
-  OFFICE = "Office",
-  REMOTE = "Remote",
-  HYBRID = "Hybrid",
-  OTHER = "Other",
+  OFFICE = "office",
+  REMOTE = "remote",
+  HYBRID = "hybrid",
+  OTHER = "other",
 }
 
 export enum VacancyStatus {
-  OPEN = "Open",
-  CLOSED = "Closed",
-  PAUSED = "Paused",
+  OPEN = "open",
+  CLOSED = "closed",
+  PAUSED = "paused",
 }
 
 @Entity("vacancies")
@@ -79,15 +79,7 @@ export class Vacancy {
     length: 255,
     nullable: false,
   })
-  title!: string;
-
-  @Column({
-    // Job specialization (Profession)
-    type: "varchar",
-    length: 150,
-    nullable: true,
-  })
-  specialization?: string;
+  profession!: string;
 
   @Column({
     // Preferred expirience (in years)
@@ -177,7 +169,7 @@ export class Vacancy {
     type: "date",
     nullable: true,
   })
-  closedAt?: Date;
+  deadLine?: Date;
 
   @Column({
     type: "int",

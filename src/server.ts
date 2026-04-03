@@ -54,8 +54,9 @@ server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply)
 });
 
 server.register(require("./routes/users"), { prefix: "/api/users" });
-server.register(require("./routes/resumes"), { prefix: "/api/resumes" });
 server.register(require("./routes/professions"), { prefix: "/api/professions" });
+server.register(require("./routes/resumes"), { prefix: "/api/resumes" });
+server.register(require("./routes/vacancies"), { prefix: "/api/vacancies" });
 
 const start = async () => {
   try {
