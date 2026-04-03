@@ -70,6 +70,13 @@ export class User {
   })
   gender!: Gender;
 
+  @Column({
+    // Profile description
+    type: "text",
+    nullable: true,
+  })
+  description?: string;
+
   @Column({ type: "varchar", length: 100, nullable: true }) //City, optional, check on server side
   city?: string;
 
@@ -162,13 +169,6 @@ export class Specialist extends User {
     default: ProfileStatus.INACTIVE,
   })
   status!: ProfileStatus;
-
-  @Column({
-    // Profile description
-    type: "text",
-    nullable: true,
-  })
-  description?: string;
 
   @Column({
     // Birthdate

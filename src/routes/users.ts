@@ -54,6 +54,7 @@ const updateSchema = {
         type: "array",
         items: { type: "string", format: "uri" },
       },
+      description: { type: "string", maxLength: 500 },
       // Employer specific
       managerPosition: { type: "string", maxLength: 150 },
       companyName: { type: "string", maxLength: 255 },
@@ -74,7 +75,6 @@ const updateSchema = {
         type: "string",
         enum: Object.values(ProfileStatus),
       },
-      description: { type: "string" },
       birthDate: { type: "string", format: "date" }, // Validates "YYYY-MM-DD"
       citizenship: { type: "boolean" },
     },
@@ -119,9 +119,7 @@ module.exports = async (fastify: FastifyInstance) => {
         return res.status(400).send({ success: false, message: "Bad request" });
       }
       const data = req.body;
-      const userRepository = Database.getRepository(
-        req.params.role === Role.EMPLOYER ? Employer : Specialist,
-      );
+      const userPool = Database.getRepository(req.params.role === Role.EMPLOYER ? Employer : Specialist);
       const existingUser = await Database.getRepository("User").findOne({
         where: [{ email: data.email }, { phone: data.phone }],
       });
@@ -138,14 +136,14 @@ module.exports = async (fastify: FastifyInstance) => {
           if (!req.body.tin) {
             return res.status(400).send({ success: false, message: "TIN missing/invalid" });
           }
-          user = userRepository.create({
+          user = userPool.create({
             ...data,
             password: hashedPassword,
             verified: false,
           });
           break;
         case Role.SPECIALIST:
-          user = userRepository.create({
+          user = userPool.create({
             ...data,
             password: hashedPassword,
           });
@@ -155,7 +153,7 @@ module.exports = async (fastify: FastifyInstance) => {
       }
 
       try {
-        await userRepository.save(user);
+        await userPool.save(user);
         const { password, ...userResponse } = user;
         return res.status(201).send({
           success: true,
@@ -171,15 +169,15 @@ module.exports = async (fastify: FastifyInstance) => {
 
   fastify.post("/login", { schema: loginSchema }, async (req, res) => {
     const data = req.body as any;
-    const userRepository = Database.getRepository(User);
-    const user = await userRepository.findOne({ where: { email: data.email } });
+    const userPool = Database.getRepository(User);
+    const user = await userPool.findOne({ where: { email: data.email } });
     if (!user) {
       return res.status(404).send({ success: false, message: "User not found" });
     }
     if (!(await bcrypt.compare(data.password, user.password))) {
       res.status(401).send({ success: false, message: "Invalid Password" });
     }
-    const token = fastify.jwt.sign({ id: user.id });
+    const token = fastify.jwt.sign({ id: user.id, role: user.role });
     return res
       .setCookie("access_token", token, {
         httpOnly: true,
@@ -214,10 +212,10 @@ module.exports = async (fastify: FastifyInstance) => {
   });
 
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
-    const userRepository = Database.getRepository(User);
+    const userPool = Database.getRepository(User);
     let user;
     try {
-      user = await userRepository.findOne({ where: { id: req.params.id } });
+      user = await userPool.findOne({ where: { id: req.params.id } });
     } catch (e) {
       return res.status(500).send({ success: false, message: "Internal Server Error" });
     }
@@ -229,6 +227,7 @@ module.exports = async (fastify: FastifyInstance) => {
       surname: user.surname,
       email: user.email,
       gender: user.gender,
+      description: user.description,
       socialLinks: user.socialLinks,
       verified: user.verified,
     };
@@ -238,14 +237,15 @@ module.exports = async (fastify: FastifyInstance) => {
         basicInfo.position = user.managerPosition;
         basicInfo.company = user.companyName;
         basicInfo.companyWebsite = user.companyWebsite;
+        basicInfo.vacancies = user.vacancies;
         break;
       case Role.SPECIALIST:
         // info only a specialist has
         basicInfo.education = user.education;
         basicInfo.status = user.status;
-        basicInfo.description = user.description;
         basicInfo.birthDate = user.birthDate;
         basicInfo.citizenship = user.citizenship;
+        basicInfo.resumes = user.resumes;
         break;
     }
 
@@ -270,8 +270,8 @@ module.exports = async (fastify: FastifyInstance) => {
     "/update",
     { preHandler: fastify.authenticate, schema: updateSchema },
     async (req, res) => {
-      const userRepository = Database.getRepository(User);
-      const user = await userRepository.findOne({ where: { id: req.user.id } });
+      const userPool = Database.getRepository(User);
+      const user = await userPool.findOne({ where: { id: req.user.id } });
 
       if (!user) {
         return res.status(404).send({ success: false, message: "User not found" });
@@ -295,8 +295,8 @@ module.exports = async (fastify: FastifyInstance) => {
       Object.assign(user, updateData);
 
       try {
-        await userRepository.save(user);
-        return res.status(200).send({ success: true, message: "Successfully Updated" });
+        await userPool.save(user);
+        return res.status(204).send({ success: true, message: "Successfully Updated" });
       } catch (err) {
         console.log(err);
         return res.status(500).send({ success: false, message: "Database Error" });

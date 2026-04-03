@@ -7,14 +7,15 @@ import {
   ManyToOne,
   JoinColumn,
   Relation,
+  DeleteDateColumn,
 } from "typeorm";
 import { Specialist } from "./User";
 
 export enum ResumeWorkFormat {
-  OFFICE = "Office",
-  REMOTE = "Remote",
-  HYBRID = "Hybrid",
-  OTHER = "Other",
+  OFFICE = "office",
+  REMOTE = "remote",
+  HYBRID = "hybrid",
+  OTHER = "other",
 }
 
 export enum ResumeStatus {
@@ -46,6 +47,12 @@ export class Resume {
   })
   profession!: string;
 
+  @Column({ type: "text", nullable: false })
+  name!: string;
+
+  @Column({ type: "text", nullable: false })
+  surname!: string;
+
   @Column({
     // Job expirience, in years
     type: "int",
@@ -74,17 +81,9 @@ export class Resume {
     // Min salary
     name: "desired_salary_from",
     type: "int",
-    nullable: true,
+    default: 0,
   })
-  desiredSalaryFrom?: number;
-
-  @Column({
-    // Max salary
-    name: "desired_salary_to",
-    type: "int",
-    nullable: true,
-  })
-  desiredSalaryTo?: number;
+  desiredSalaryFrom!: number;
 
   @Column({
     // Preferred city
@@ -127,4 +126,7 @@ export class Resume {
     default: () => "CURRENT_TIMESTAMP",
   })
   updatedAt?: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date; // TypeORM will manage this automatically
 }
