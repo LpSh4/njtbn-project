@@ -1,3 +1,8 @@
+ import bell from "./icons/Bell.png";
+ import fav from "./icons/fav-icon.png";
+ import chat from "./icons/chat-thing.png";
+
+
  <ul className="header__list">
                     <li className="header__list-item">
                         <a href=""><img style={{ width: "25px" }} src={bell} alt="" /></a>

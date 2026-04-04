@@ -10,6 +10,10 @@
     @include mixins.flex(column,center,center);
   }
 
+  @media (max-width: 425px) {
+    height: 285px;
+  }
+
   &__description{
     @include mixins.flex(column,start,start);
     gap: 11px;
@@ -21,6 +25,7 @@
     p{
       font-size: 25px;
       color:rgba(000,000,000,0.5);
+      text-overflow: ellipsis;
       @media (max-width: 768px) {
         font-size: 16px;
       }
@@ -47,6 +52,7 @@
     p{
       font-size: 30px;
       color: #000000;
+      text-overflow: ellipsis;
       @media (max-width: 768px) {
         font-size: 25px;
       }

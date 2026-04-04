@@ -1,35 +1,103 @@
 @use "../../styles/mixins";
 
 .header{
+  position: relative;
   padding: 10px 52px;
   @include mixins.flex(row,space-between,center,wrap);
   background-color: #3914AF;
+  z-index: 100;
+    @media (max-width: 768px) {
+    gap: 16px;
+  }
 
-  &__logo{
+  &__element-cont{
     @include mixins.flex();
    column-gap: 16px;
-
+    @media (max-width: 768px) {
+      @include mixins.flex(column);
+    }
 
   }
 
   &__url{
     @include mixins.flex(row,center,center,wrap);
     column-gap: 27px;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   &__img{
     padding-right: 16px ;
     border-right: solid 1px white ;
+    @media (max-width: 768px) {
+      padding-right: 0px ;
+      border-right: 0px;
+
+    }
   }
 
 
 
   &__nav{
-    @include mixins.flex()
+    @include mixins.flex();
+    @media (max-width:768px) {
+      display: none;
+    }
   }
 
   &__list{
     @include mixins.flex();
     column-gap: 19px;
+    @media (max-width: 768px) {
+    @include mixins.flex(column);
+      gap: 16px;
+    }
+  }
+}
+
+.burger {
+  display: none;
+  position: relative;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+}
+.mobile-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 180px;
+  border-radius: 14px;
+  background: #fff;
+  padding: 20px 0;
+  z-index: 10;
+  transform: translateY(-10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s ease;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__item{
+    padding: 0 0 10px 0;
+    border-bottom: solid 0.5px rgba(106, 106, 106, 0.8);
+  }
+
+  &__item a {
+    padding: 10px;
+    color: #000;
+  }
+
+  &.active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 }
