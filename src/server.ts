@@ -6,7 +6,7 @@ import fastifyCookie from "@fastify/cookie";
 import helmet from "@fastify/helmet";
 
 const server = fastify({
-  // trustProxy: true,
+  trustProxy: true,
   logger: true,
 });
 console.log("Server started");
@@ -41,7 +41,7 @@ server.register(cors, {
     cb(new Error("Not allowed by CORS"), false);
   },
   credentials: true,
-  methods: ["GET", "POST", "PATCH", "DELETE"],
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 });
 
