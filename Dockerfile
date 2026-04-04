@@ -4,11 +4,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm i --production
+RUN npm i
 
 COPY . .
 
-RUN npm tsc -p tsconfig.json
+RUN npx tsc -p tsconfig.json
 
 EXPOSE 3000
 
