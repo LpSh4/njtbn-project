@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm i
 COPY . .
-RUN npm tsc -p tsconfig.json
+RUN npx tsc -p tsconfig.json
 
 #Runner container
 FROM node:20-alpine AS runner
