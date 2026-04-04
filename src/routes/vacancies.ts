@@ -5,7 +5,6 @@ import { Role, User } from "../entities/User";
 import { Database } from "../datasource";
 import { Vacancy, VacancyStatus, WorkFormat, WorkingHours, WorkSchedule } from "../entities/Vacancy";
 import { Brackets, Not } from "typeorm";
-import { ResumeWorkFormat } from "../entities/Resume";
 
 const createSchema = {
   body: {
@@ -29,7 +28,7 @@ const createSchema = {
       salaryTo: { type: "number" },
       experience: { type: "number", default: 0 },
       city: { type: "string", minLength: 1 },
-      description: { type: "string", minLength: 1, maxLength: 1000 },
+      description: { type: "string", maxLength: 1000 },
       deadLine: { type: "string", format: "date" }, // Validates "YYYY-MM-DD"
       requiredSkills: { type: "array", items: { type: "string" } },
     },
@@ -48,7 +47,7 @@ const updateSchema = {
       salaryTo: { type: "number" },
       experience: { type: "number", default: 0 },
       city: { type: "string", minLength: 1 },
-      description: { type: "string", minLength: 1, maxLength: 1000 },
+      description: { type: "string", maxLength: 1000 },
       deadLine: { type: "string", format: "date" }, // Validates "YYYY-MM-DD"
       requiredSkills: { type: "array", items: { type: "string" } },
       status: { type: "string", enum: Object.values(VacancyStatus) },
@@ -69,6 +68,7 @@ const searchSchema = {
       expTo: { type: "integer" },
       workFormat: { type: "string", enum: Object.values(WorkFormat) },
       workSchedule: { type: "string", enum: Object.values(WorkSchedule) },
+      workingHours: { type: "string", enum: Object.values(WorkingHours) },
       sortBy: {
         type: "string",
         enum: ["least_popular", "most_popular", "least_paid", "most_paid", "fresh"],
@@ -77,6 +77,20 @@ const searchSchema = {
     },
   },
 };
+
+interface createBody {
+  profession: string;
+  workFormat: string;
+  workSchedule: string;
+  workingHours: string;
+  salaryFrom?: number;
+  salaryTo?: number;
+  experience: number;
+  city: string;
+  description?: string;
+  deadLine?: string;
+  requiredSkills: [];
+}
 
 interface updateBody {
   profession?: string;
@@ -93,20 +107,6 @@ interface updateBody {
   status?: VacancyStatus;
 }
 
-interface createBody {
-  profession: string;
-  workFormat: string;
-  workSchedule: string;
-  workingHours: string;
-  salaryFrom?: number;
-  salaryTo?: number;
-  experience: number;
-  city: string;
-  description?: string;
-  deadLine?: string;
-  requiredSkills: [];
-}
-
 interface SearchQuery {
   page: number;
   keywords?: string;
@@ -115,9 +115,9 @@ interface SearchQuery {
   salaryTo?: number;
   expFrom?: number;
   expTo?: number;
-  workFormat?: ResumeWorkFormat;
+  workFormat?: WorkFormat;
   workSchedule?: string;
-  workingHours?: number;
+  workingHours?: string;
   sortBy: "least_popular" | "most_popular" | "least_paid" | "most_paid" | "fresh";
 }
 
@@ -202,13 +202,13 @@ module.exports = async (fastify: FastifyInstance) => {
         workFormat: workFormat ? workFormat : vacancy.workFormat,
         workSchedule: workSchedule ? workSchedule : vacancy.workSchedule,
         workingHours: workingHours ? workingHours : vacancy.workingHours,
-        salaryFrom: salaryFrom ? salaryFrom : null,
-        salaryTo: salaryTo ? salaryTo : null,
+        salaryFrom: salaryFrom ? salaryFrom : vacancy.salaryFrom,
+        salaryTo: salaryTo ? salaryTo : vacancy.salaryTo,
         experience: experience ? experience : vacancy.experience,
         city: city ? city : vacancy.city,
-        description: description ?? "",
+        description: description ? description : vacancy.description,
         deadLine: deadLine ? deadLine : vacancy.deadLine,
-        requiredSkills: requiredSkills ? requiredSkills : [],
+        requiredSkills: requiredSkills ? requiredSkills : vacancy.requiredSkills,
         status: status ? status : vacancy.status,
       };
 
@@ -216,7 +216,7 @@ module.exports = async (fastify: FastifyInstance) => {
 
       try {
         await vacancyPool.save(vacancy);
-        return res.status(201).send({ success: true, message: "OK", data: vacancy });
+        return res.status(200).send({ success: true, message: "OK", data: vacancy });
       } catch (e) {
         return res.status(500).send({ success: false, message: "Internal server error" });
       }
@@ -239,8 +239,8 @@ module.exports = async (fastify: FastifyInstance) => {
           ...(req.user.id !== req.params.id ? { status: Not(VacancyStatus.CLOSED) } : {}),
         },
       });
-      if (!vacancies) {
-        return res.status(404).send({ success: true, message: "Resumes not found" });
+      if (vacancies.length < 1) {
+        return res.status(404).send({ success: false, message: "Vacancies not found" });
       }
       vacancies = vacancies.map((vacancy: Vacancy) => {
         const { id, profession, workFormat, city, salaryFrom, salaryTo } = vacancy;
@@ -329,6 +329,7 @@ module.exports = async (fastify: FastifyInstance) => {
       expTo,
       workFormat,
       workSchedule,
+      workingHours,
       sortBy,
     } = req.query;
 
@@ -372,6 +373,7 @@ module.exports = async (fastify: FastifyInstance) => {
     if (expTo) query.andWhere("vacancy.experience <= :eTo", { eTo: expTo });
     if (workFormat) query.andWhere("vacancy.work_format = :wf", { wf: workFormat });
     if (workSchedule) query.andWhere("vacancy.work_schedule = :ws", { ws: workSchedule });
+    if (workingHours) query.andWhere("vacancy.working_hours = :wh", { wh: workingHours });
 
     switch (sortBy) {
       case "most_popular":

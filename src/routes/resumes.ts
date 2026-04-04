@@ -178,9 +178,11 @@ module.exports = async (fastify: FastifyInstance) => {
       const update = {
         profession: data.profession ? data.profession : resume.profession,
         experience: data.experience ? data.experience : resume.experience,
-        experienceDescription: data.experienceDescription ? data.experienceDescription : "",
-        skills: data.skills ? data.skills : [],
-        desiredSalaryFrom: data.desiredSalaryFrom,
+        experienceDescription: data.experienceDescription
+          ? data.experienceDescription
+          : resume.experienceDescription,
+        skills: data.skills ? data.skills : resume.skills,
+        desiredSalaryFrom: data.desiredSalaryFrom ? data.desiredSalaryFrom : resume.desiredSalaryFrom,
         city: data.city ? data.city : resume.city,
         workFormat: data.workFormat ? data.workFormat : resume.workFormat,
         status: data.status ? data.status : resume.status,
@@ -212,8 +214,8 @@ module.exports = async (fastify: FastifyInstance) => {
           ...(req.user.id !== req.params.id ? { status: ResumeStatus.ACTIVE } : {}),
         },
       });
-      if (!resumes) {
-        return res.status(404).send({ success: true, message: "Resumes not found" });
+      if (resumes.length < 1) {
+        return res.status(404).send({ success: false, message: "Resumes not found" });
       }
       resumes = resumes.map((resume: Resume) => {
         const { workFormat, profession, desiredSalaryFrom, id } = resume;
@@ -269,13 +271,13 @@ module.exports = async (fastify: FastifyInstance) => {
       await resumePool.increment({ id: resume.id }, "views", 1);
       const compiledData = {
         user: {
+          id: user.id,
           gender: user.gender,
           age: new Date().getFullYear() - new Date(user.birthDate).getFullYear(),
           city: user.city,
           updatedAt: user.updatedAt,
         },
         resume: {
-          id: resume.id,
           profession: resume.profession,
           experience: resume.experience,
           experienceDescription: resume.experienceDescription,

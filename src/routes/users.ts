@@ -115,9 +115,6 @@ module.exports = async (fastify: FastifyInstance) => {
     "/signup/:role",
     { schema: signupSchema },
     async (req, res) => {
-      if (!req.body) {
-        return res.status(400).send({ success: false, message: "Bad request" });
-      }
       const data = req.body;
       const userPool = Database.getRepository(req.params.role === Role.EMPLOYER ? Employer : Specialist);
       const existingUser = await Database.getRepository("User").findOne({

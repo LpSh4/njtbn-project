@@ -57,6 +57,7 @@ server.register(require("./routes/users"), { prefix: "/api/users" });
 server.register(require("./routes/professions"), { prefix: "/api/professions" });
 server.register(require("./routes/resumes"), { prefix: "/api/resumes" });
 server.register(require("./routes/vacancies"), { prefix: "/api/vacancies" });
+server.register(require("./routes/applications"), { prefix: "/api/applications" });
 
 const start = async () => {
   try {

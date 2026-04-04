@@ -148,6 +148,9 @@ export class Employer extends User {
   })
   companyWebsite?: string;
 
+  @OneToMany("Application", (application: Application) => application.employer)
+  applications?: Relation<Application[]>;
+
   @OneToMany("Vacancy", (vacancy: Vacancy) => vacancy.manager)
   vacancies?: Relation<Vacancy[]>;
 }

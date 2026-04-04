@@ -6,12 +6,14 @@ import {
   ManyToOne,
   JoinColumn,
   Relation,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from "typeorm";
-import { Specialist } from "./User";
+import { Employer, Specialist } from "./User";
 import { Vacancy } from "./Vacancy";
 
 export enum ApplicationStatus {
-  CREATED = "viewed",
+  CREATED = "created",
   INVITED = "invited",
   ACCEPTED = "accepted",
   REJECTED = "rejected",
@@ -33,6 +35,16 @@ export class Application {
   applicant!: Relation<Specialist>;
 
   @Column({
+    // One employer can manage multiple applications
+    name: "employer_id",
+  })
+  employerId!: string;
+
+  @ManyToOne(() => Employer, (employer) => employer.applications)
+  @JoinColumn({ name: "employer_id" })
+  employer!: Relation<Employer>;
+
+  @Column({
     // One vacancy can have multiple applications
     name: "vacancy_id",
   })
@@ -52,4 +64,10 @@ export class Application {
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
+
+  @UpdateDateColumn({ name: "updated_at" })
+  updatedAt!: Date;
+
+  @DeleteDateColumn({ name: "deleted_at" })
+  deletedAt?: Date;
 }
