@@ -12,6 +12,7 @@ import {
 import type { Vacancy } from "./Vacancy";
 import type { Resume } from "./Resume";
 import type { Application } from "./Application";
+import { Notification } from "./Notification";
 
 export enum Gender {
   MALE = "male",
@@ -89,6 +90,12 @@ export class User {
     default: "{}",
   })
   socialLinks?: string[];
+
+  @OneToMany("Notification", (notification: any) => notification.sender)
+  notificationsSent?: Relation<Notification[]>;
+
+  @OneToMany("Notification", (notification: any) => notification.recipient)
+  notificationsReceived?: Relation<Notification[]>;
 
   @CreateDateColumn({
     name: "created_at",

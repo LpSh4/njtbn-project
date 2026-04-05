@@ -5,6 +5,7 @@ import { Specialist, Employer, User } from "./entities/User";
 import { Application } from "./entities/Application";
 import { Vacancy } from "./entities/Vacancy";
 import { Profession, JobTitle } from "./entities/Professions";
+import { Notification } from "./entities/Notification";
 
 dotenv.config();
 
@@ -15,7 +16,17 @@ export const Database = new DataSource({
   username: process.env.PSQL_LOGIN! || "postgres",
   password: process.env.PSQL_PASSWORD! || "postgres",
   database: process.env.PSQL_DATABASE! || "postgres",
-  entities: [User, Employer, Specialist, Vacancy, Resume, Application, Profession, JobTitle],
+  entities: [
+    User,
+    Employer,
+    Specialist,
+    Vacancy,
+    Resume,
+    Application,
+    Profession,
+    JobTitle,
+    Notification,
+  ],
   synchronize: true,
   logging: false,
 });

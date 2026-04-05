@@ -29,15 +29,15 @@ export class Resume {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ name: "specialist_id", nullable: true })
-  specialistId?: string | null;
+  @Column({ name: "specialist_id" })
+  specialistId!: string;
 
-  @ManyToOne(() => Specialist, (specialist) => specialist.resumes)
+  @ManyToOne(() => Specialist, (specialist) => specialist.resumes, { onDelete: "CASCADE" })
   // One employer can manage multiple vacancies, but one vacancy can have only one manager
   @JoinColumn({
     name: "specialist_id",
   })
-  specialist?: Relation<Specialist>;
+  specialist!: Relation<Specialist>;
 
   @Column({
     // Profession, including title

@@ -8,6 +8,7 @@ import {
   JoinColumn,
   Relation,
   OneToMany,
+  Check,
 } from "typeorm";
 import { Employer } from "./User";
 import { Application } from "./Application";
@@ -59,19 +60,20 @@ export enum VacancyStatus {
 }
 
 @Entity("vacancies")
+@Check(`"salary_from" <= "salary_to"`)
 export class Vacancy {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ name: "manager_id", nullable: true })
-  managerId?: string | null;
+  @Column({ name: "manager_id", nullable: false })
+  managerId!: string;
 
-  @ManyToOne(() => Employer, (manager) => manager.vacancies)
+  @ManyToOne(() => Employer, (manager) => manager.vacancies, { onDelete: "CASCADE" })
   // One employer can manage multiple vacancies, but one vacancy can have only one manager
   @JoinColumn({
     name: "manager_id",
   })
-  manager?: Relation<Employer>;
+  manager!: Relation<Employer>;
 
   @Column({
     // Vacancy title (Should include the job title, etc)

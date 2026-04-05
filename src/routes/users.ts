@@ -12,6 +12,7 @@ import {
 import { fastifyCookie } from "@fastify/cookie";
 import { Database } from "../datasource";
 const bcrypt = require("bcrypt");
+import { ValidateTIN } from "../services/ValidateTIN";
 
 const signupSchema = {
   body: {
@@ -42,7 +43,6 @@ const loginSchema = {
 const updateSchema = {
   body: {
     type: "object",
-    required: ["phone", "gender", "city"],
     properties: {
       phone: { type: "string", pattern: "^89\\d{9}$" },
       gender: {
@@ -63,6 +63,7 @@ const updateSchema = {
         pattern:
           "^https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)$",
       },
+      tin: { type: "string", minLength: 10, maxLength: 12 },
       // Specialist specific
       educations: {
         type: "array",
@@ -82,15 +83,16 @@ const updateSchema = {
 };
 
 interface updateBody {
-  phone: string;
-  gender: string;
-  city: string;
+  phone?: string;
+  gender?: string;
+  city?: string;
   socialLinks: [];
   managerPosition?: string;
   companyName?: string;
   companyWebsite?: string;
   educations?: [];
   status?: string;
+  tin?: string;
   description?: string;
   birthDate?: Date;
   citizenship?: boolean;
@@ -118,7 +120,8 @@ module.exports = async (fastify: FastifyInstance) => {
       const data = req.body;
       const userPool = Database.getRepository(req.params.role === Role.EMPLOYER ? Employer : Specialist);
       const existingUser = await Database.getRepository("User").findOne({
-        where: [{ email: data.email }, { phone: data.phone }],
+        email: data.email,
+        phone: data.phone,
       });
       if (existingUser) {
         return res
@@ -133,10 +136,12 @@ module.exports = async (fastify: FastifyInstance) => {
           if (!req.body.tin) {
             return res.status(400).send({ success: false, message: "TIN missing/invalid" });
           }
+          const validateTIN = new ValidateTIN();
+          const valid = await validateTIN.isExists(req.body.tin.toString());
           user = userPool.create({
             ...data,
             password: hashedPassword,
-            verified: false,
+            verified: valid,
           });
           break;
         case Role.SPECIALIST:
@@ -278,6 +283,8 @@ module.exports = async (fastify: FastifyInstance) => {
       const updateData: any = req.body;
       switch (user.role) {
         case Role.EMPLOYER:
+          const validateTIN = new ValidateTIN();
+          updateData.verified = await validateTIN.isExists(updateData.tin);
           delete updateData.educations;
           delete updateData.status;
           delete updateData.description;

@@ -3,6 +3,7 @@ import { Vacancy, VacancyStatus } from "../entities/Vacancy";
 import { Role, User } from "../entities/User";
 import { Database } from "../datasource";
 import { Application, ApplicationStatus } from "../entities/Application";
+import { NotificationService } from "../services/NotificationService";
 
 interface viewQuery {
   status: ApplicationStatus;
@@ -26,7 +27,8 @@ module.exports = (fastify: FastifyInstance) => {
       }
       const applicantId = req.user.id;
       const userPool = Database.getRepository(User);
-      if (!(await userPool.findOne({ where: { id: applicantId } }))) {
+      const user = await userPool.findOne({ where: { id: applicantId } });
+      if (!user) {
         return res.status(404).send({ success: false, message: "Specialist not found" });
       }
       const employerId = vacancy.managerId;
@@ -49,6 +51,7 @@ module.exports = (fastify: FastifyInstance) => {
 
       try {
         await applicationPool.save(application);
+        await NotificationService.notifyNewApplication(user.name, employerId);
         return res.status(201).send({ success: true, message: "Created", data: application });
       } catch (e) {
         return res.status(500).send({ success: false, message: "Internal Server Error" });

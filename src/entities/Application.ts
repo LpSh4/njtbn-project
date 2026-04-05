@@ -8,6 +8,7 @@ import {
   Relation,
   UpdateDateColumn,
   DeleteDateColumn,
+  Unique,
 } from "typeorm";
 import { Employer, Specialist } from "./User";
 import { Vacancy } from "./Vacancy";
@@ -20,6 +21,7 @@ export enum ApplicationStatus {
 }
 
 @Entity("applications")
+@Unique(["applicantId", "vacancyId"])
 export class Application {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
