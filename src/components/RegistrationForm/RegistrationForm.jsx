@@ -1,125 +1,129 @@
-import "./RegistrationForm.scss"
-import { useState } from "react";
+import "./RegistrationForm.scss";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { getRegisterSchema } from "../../validation/registerSchema.js";
+import { PatternFormat } from "react-number-format";
+import { Controller } from "react-hook-form";
+import { registerUser } from "../../api/authApi";
 
-export const RegistrationForm = ({ role }) => {
-    const [formData, setFormData] = useState({
-        email: "",
-        phone: "",
-        name: "",
-        surname: "",
-        password: "",
-        confirmPassword: "",
-        inn: ""
+const RegistrationForm = ({ role }) => {
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(getRegisterSchema(role)),
     });
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    const onSubmit = async (data) => {
+        try {
+            const payload = {
+                name: data.name,
+                surname: data.surname,
+                email: data.email,
+                phone: data.phone.replace(/\D/g, ""),
+                password: data.password,
+                ...(role === "employer" && { tin: data.tin }),
+            };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+            const res = await registerUser(role, payload);
 
-        if (formData.password !== formData.confirmPassword) {
-            alert("Пароли не совпадают");
-            return;
+            console.log("SUCCESS:", res.data);
+            alert("Регистрация успешна");
+
+        } catch (e) {
+            console.error("ERROR FULL:", e);
+            alert(e.response?.data?.message || "Ошибка регистрации");
         }
-
-        console.log(formData);
     };
 
-    return(
-        <>
-            <section className="employer">
-                <section className="employer__cont">
-                    <h2>Регистрация</h2>
-                    <form onSubmit={handleSubmit} className="employer__form" action="">
-                        <div className="employer__input-cont">
-                            <p>
-                                <label htmlFor="">Почта</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    placeholder="Введите вашу почту"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                />
-                            </p>
-                            <p>
-                                <label htmlFor="">Телефон</label>
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    placeholder="Введите ваш номер телефона"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                />
-                            </p>
-                            <p>
-                                <label htmlFor="">Имя</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Введите ваше имя"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                />
-                            </p>
-                            <p>
-                                <label htmlFor="">Фамилия</label>
-                                <input
-                                    type="text"
-                                    name="surname"
-                                    placeholder="Введите вашу фамилию"
-                                    value={formData.surname}
-                                    onChange={handleChange}
-                                />
-                            </p>
-                        </div>
+    return (
+        <section className="employer">
+            <section className="employer__cont">
+                <h2>Регистрация</h2>
 
-                        <div className="employer__input-cont">
-                            <p>
-                                <label htmlFor="">Пароль</label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    placeholder="Введите пароль"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                />
-                            </p>
-                            <p>
-                                <input
-                                    type="password"
-                                    name="confirmPassword"
-                                    placeholder="Подвтердите пароль"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                />
-                            </p>
+                <form onSubmit={handleSubmit(onSubmit)} className="employer__form">
 
-                            {role === "employer" && (
-                                <p>
-                                    <label>ИНН</label>
-                                    <input
-                                        type="text"
-                                        name="inn"
-                                        placeholder="Введите ИНН"
-                                        value={formData.inn}
-                                        onChange={handleChange}
+                    <div className="employer__input-cont">
+
+                        <p>
+                            <label>Почта</label>
+                            <input {...register("email")} placeholder="Введите почту" />
+                            <span className="error">{errors.email?.message}</span>
+                        </p>
+
+                        <p>
+                            <label>Телефон</label>
+
+                            <Controller
+                                name="phone"
+                                control={control}
+                                render={({ field }) => (
+                                    <PatternFormat
+                                        {...field}
+                                        format="8 (9##) ###-##-##"
+                                        mask="_"
+                                        placeholder="8 (9__) ___-__-__"
+                                        onValueChange={(values) => {
+                                            let phone = values.value;
+
+                                            if (phone.length === 11) {
+                                                phone = "89" + phone.slice(2);
+                                                field.onChange(phone);
+                                            } else {
+                                                field.onChange("");
+                                            }
+                                        }}
                                     />
-                                </p>
-                            )}
-                            <button>Зарегистрироваться</button>
-                        </div>
+                                )}
+                            />
 
+                            <span className="error">{errors.phone?.message}</span>
+                        </p>
 
-                    </form>
-                </section>
+                        <p>
+                            <label>Имя</label>
+                            <input {...register("name")} />
+                            <span className="error">{errors.name?.message}</span>
+                        </p>
+
+                        <p>
+                            <label>Фамилия</label>
+                            <input {...register("surname")} />
+                            <span className="error">{errors.surname?.message}</span>
+                        </p>
+                    </div>
+
+                    <div className="employer__input-cont">
+
+                        <p>
+                            <label>Пароль</label>
+                            <input type="password" {...register("password")} />
+                            <span className="error">{errors.password?.message}</span>
+                        </p>
+
+                        <p>
+                            <label>Повторите пароль</label>
+                            <input type="password" {...register("confirmPassword")} />
+                            <span className="error">{errors.confirmPassword?.message}</span>
+                        </p>
+
+                        {role === "employer" && (
+                            <p>
+                                <label>ИНН</label>
+                                <input {...register("tin")} />
+                                <span className="error">{errors.tin?.message}</span>
+                            </p>
+                        )}
+
+                        <button type="submit">Зарегистрироваться</button>
+
+                    </div>
+                </form>
             </section>
-        </>
-    )
-}
+        </section>
+    );
+};
+
 export default RegistrationForm;

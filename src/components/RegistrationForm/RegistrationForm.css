@@ -184,3 +184,10 @@
   background-color: #3914AF;
   border-radius: 29px;
 }
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
