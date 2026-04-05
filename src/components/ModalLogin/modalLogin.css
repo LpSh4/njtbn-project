@@ -1,0 +1,181 @@
+.modalLogin {
+  padding: 48px 35px 13px 35px;
+  width: 523px;
+  height: 516px;
+  border-radius: 49px;
+  position: fixed;
+  background-color: #ffffff;
+  -webkit-transform: translate(-50%);
+          transform: translate(-50%);
+  top: 20%;
+  left: 50%;
+  z-index: 1;
+  -webkit-box-shadow: 0 0 10px 0 #1e1e1e;
+          box-shadow: 0 0 10px 0 #1e1e1e;
+  display: none;
+}
+@media (max-width: 550px) {
+  .modalLogin {
+    padding: 48px 45px 13px 45px;
+    width: 323px;
+    border-radius: 22px;
+  }
+}
+@media (max-width: 350px) {
+  .modalLogin {
+    padding: 48px 45px 13px 45px;
+    width: 280px;
+    border-radius: 22px;
+  }
+}
+.modalLogin button {
+  color: #000000;
+}
+.modalLogin__close {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: end;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+}
+.modalLogin__close img {
+  width: 40px;
+}
+.modalLogin h2 {
+  text-align: center;
+  font-size: 25px;
+  color: #000000;
+}
+.modalLogin__form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  gap: 46px;
+}
+.modalLogin__input-field {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  gap: 45px;
+}
+.modalLogin__input-field button {
+  border-radius: 26px;
+  padding: 16px 44px;
+  background-color: #3914AF;
+  color: rgba(255, 255, 255, 0.7);
+}
+.modalLogin__text-cont {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  gap: 16px;
+}
+.modalLogin__text-cont p {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  gap: 8px;
+}
+.modalLogin__text-cont p label {
+  color: #000000;
+}
+.modalLogin__text-cont p input {
+  color: #000000;
+  padding: 14px 15px 14px 16px;
+  border-radius: 26px;
+  width: 300px;
+  border: solid 1px rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 550px) {
+  .modalLogin__text-cont p input {
+    width: 223px;
+    border-radius: 22px;
+  }
+}
+@media (max-width: 350px) {
+  .modalLogin__text-cont p input {
+    width: 173px;
+    border-radius: 22px;
+  }
+}
+.modalLogin a {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.modalLogin.active {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+}

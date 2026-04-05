@@ -128,3 +128,13 @@ body > * {
   width: 100%;
   max-width: 1920px;
 }
+
+.main.blur {
+  -webkit-filter: blur(15px);
+          filter: blur(15px);
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}

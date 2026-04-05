@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import logo from "./icons/logo.png";
 import menu from "./icons/Menu.png";
 
-export default function Header() {
+export default function Header({ setIsLoginOpen }) {
     const [isOpen, setIsOpen] = useState(false);
+
+
 
     return (
         <header className="header">
@@ -24,7 +26,9 @@ export default function Header() {
             </div>
 
             <div className="header__url">
-                <a href="">Войти</a>
+                <button onClick={() => setIsLoginOpen(true)}>
+                    Войти
+                </button>
             </div>
 
             <div className="burger">
@@ -37,13 +41,16 @@ export default function Header() {
 
                 <div className={`mobile-menu ${isOpen ? "active" : ""}`}>
                     <ul className="mobile-menu__list">
-                        <li className="mobile-menu__item"><a href="">Войти</a></li>
+                        <li className="mobile-menu__item">     <button onClick={() => setIsLoginOpen(true)}>
+                            Войти
+                        </button></li>
                         <li className="mobile-menu__item"><a href="">О компании</a></li>
                         <li className="mobile-menu__item"><a href="">Партнёрам</a></li>
                         <li className="mobile-menu__item"><a href="">Требования к ПО</a></li>
                     </ul>
                 </div>
             </div>
+
         </header>
     );
 }

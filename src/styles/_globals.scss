@@ -14,3 +14,8 @@ body>*{
   max-width: 1920px;
 }
 
+.main.blur {
+  filter: blur(15px);
+  pointer-events: none;
+  user-select: none;
+}

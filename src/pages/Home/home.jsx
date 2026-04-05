@@ -2,7 +2,7 @@ import "./home.scss"
 import union from "./icons/hidden-gem.png"
 import {JobCard} from "../../components/JobCard/jobCard.jsx";
 
-export const Home = () => {
+export const Home = ({ isLoginOpen, setIsLoginOpen }) => {
     const jobsPopular = [
         {
             id: 1,
@@ -140,6 +140,8 @@ export const Home = () => {
 
     return (
         <>
+
+
 <section className="filter">
     <form action="" className="filter__form">
         <h2>Зарегистрируйтесь и ищите работу сейчас</h2>

@@ -1,0 +1,57 @@
+@use "../../styles/mixins";
+
+.choose{
+  height: 900px;
+  @include mixins.flex();
+
+  &__cont{
+    padding: 42px 62px 81px 62px;
+    @include mixins.flex(column);
+    gap: 45px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 49px;
+    @media (max-width: 450px){
+     padding: 42px 35px 31px 35px;
+
+    }
+    h2{
+      font-size: 25px;
+      color: black;
+    }
+  }
+
+  &__link-cont{
+    @include mixins.flex(column);
+    gap: 54px;
+  }
+
+  &__link{
+    padding: 49px 0;
+    width: 400px;
+    border-radius: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.5)  ;
+    background: linear-gradient(0.9turn, #3614ac, #18224a);
+    color: rgb(255, 255, 255);
+    @media (max-width: 550px){
+      width: 300px;
+
+    }
+
+    @media (max-width: 450px){
+      width: 250px;
+    }
+
+    @media (max-width: 350px){
+      width: 200px;
+    }
+  }
+
+  &__link:hover{
+    transform: scale(1.1);
+    background: linear-gradient(0.4turn, #3614ac, #000000);
+    transition: 1s;
+    @media (max-width: 550px){
+      transform: scale(1);
+    }
+  }
+}

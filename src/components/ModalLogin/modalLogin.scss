@@ -1,0 +1,108 @@
+@use "../../styles/mixins";
+
+
+.modalLogin{
+  padding: 48px 35px 13px 35px;
+  width: 523px;
+  border-radius: 49px;
+  position: fixed;
+  background-color: #ffffff;
+  transform: translate(-50%);
+  top: 20%;
+  left: 50%;
+  z-index: 1;
+  box-shadow: 0 0 10px 0 #1e1e1e;
+  display: none;
+  @media (max-width:550px ) {
+    padding: 48px 45px 13px 45px;
+    width: 323px;
+    border-radius: 22px;
+
+  }
+
+  @media (max-width:350px ) {
+    padding: 48px 45px 13px 45px;
+    width: 280px;
+    border-radius: 22px;
+  }
+
+  button{
+    color: #000000;
+  }
+
+  &__close{
+    width: 100%;
+    @include mixins.flex(row, end, center);
+    img{
+      width: 40px;
+    }
+  }
+
+  h2{
+    text-align: center;
+    font-size: 25px;
+    color: #000000;
+  }
+
+  &__form{
+    @include mixins.flex(column,center,center);
+    gap: 46px;
+
+  }
+
+  &__input-field{
+    @include mixins.flex(column);
+    gap: 45px;
+
+    button{
+      border-radius: 26px ;
+      padding: 16px 44px;
+        background-color: #3914AF;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  &__text-cont{
+    @include mixins.flex(column);
+    gap: 16px;
+
+    p{
+      @include mixins.flex(column);
+      gap: 8px;
+      label{
+        color: #000000;
+      }
+
+      input{
+        color: #000000;
+        padding: 14px 15px 14px 16px;
+        border-radius: 26px;
+        width: 300px;
+        border: solid 1px rgba(0,0,0,0.5);
+        @media (max-width:550px ) {
+          width: 223px;
+          border-radius: 22px;
+
+        }
+
+        @media (max-width:350px ) {
+          width: 173px;
+          border-radius: 22px;
+
+        }
+      }
+    }
+  }
+
+  p{
+    text-align: center;
+    color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+
+.modalLogin.active {
+  @include mixins.flex(column,space-between,center);
+
+
+}

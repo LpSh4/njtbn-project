@@ -86,12 +86,16 @@
   }
 
   &__item{
-    padding: 0 0 10px 0;
-    border-bottom: solid 0.5px rgba(106, 106, 106, 0.8);
+    padding: 10px;
+
+     border-bottom: solid 0.5px rgba(106, 106, 106, 0.8);
+
+    button{
+      color: #000000;
+    }
   }
 
   &__item a {
-    padding: 10px;
     color: #000;
   }
 
@@ -101,3 +105,4 @@
     pointer-events: auto;
   }
 }
+
