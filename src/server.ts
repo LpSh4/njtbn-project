@@ -5,15 +5,46 @@ import cors from "@fastify/cors";
 import fastifyCookie from "@fastify/cookie";
 import helmet from "@fastify/helmet";
 
+//Swagger generating
+import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUi from "@fastify/swagger-ui";
+
 const server = fastify({
   trustProxy: true,
   logger: true,
-});
+}).withTypeProvider<TypeBoxTypeProvider>();
 console.log("Server started");
 
 if (!process.env.JWT_KEY || !process.env.COOKIE_KEY) {
   throw new Error(".env missing crucial info");
 }
+// ---- Swagger docs generation
+server.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: "Ryban API",
+      description: "API Documentation for Ryban platform",
+      version: "1.0.0",
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+  },
+});
+
+server.register(fastifySwaggerUi, {
+  routePrefix: "/docs",
+  staticCSP: true,
+  transformStaticCSP: (header) => header,
+});
+
 server.register(require("./plugins/errorHandler"));
 server.register(fastifyCookie, {
   secret: process.env.COOKIE_KEY,

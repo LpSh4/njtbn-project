@@ -7,23 +7,31 @@ import { ValidateTIN } from "../services/ValidateTIN";
 import { NotificationService } from "../services/NotificationService";
 import { PoolService } from "../services/PoolService";
 import { ConflictError, NotFoundError, RequestError, UnauthorizedError } from "../services/ErrorService";
+import { Type } from "@fastify/type-provider-typebox";
 
 const bcrypt = require("bcrypt");
 const validateTIN = new ValidateTIN();
 
 const signupSchema = {
-  body: {
-    type: "object",
-    required: ["name", "surname", "email", "phone", "password"],
-    properties: {
-      name: { type: "string", minLength: 2 },
-      surname: { type: "string", minLength: 2 },
-      email: { type: "string", format: "email" },
-      phone: { type: "string", pattern: "^89\\d{9}$" }, // Strict 89xxxxxxxxx
-      password: { type: "string", minLength: 8 },
-      // Employer specific
-      tin: { type: "string", minLength: 10, maxLength: 12 },
-    },
+  tags: ["Users"],
+  summary: "Register a new user",
+  params: Type.Object({
+    role: Type.Enum(Role),
+  }),
+  body: Type.Object({
+    name: Type.String({ minLength: 2 }),
+    surname: Type.String({ minLength: 2 }),
+    email: Type.String({ format: "email" }),
+    phone: Type.String({ pattern: "^89\\d{9}$" }),
+    password: Type.String({ minLength: 8 }),
+    tin: Type.Optional(Type.String({ minLength: 10, maxLength: 12 })),
+  }),
+  response: {
+    201: Type.Object({
+      success: Type.Boolean(),
+      message: Type.String(),
+      data: Type.Any(), // Matches your userResponse
+    }),
   },
 };
 
@@ -171,7 +179,7 @@ module.exports = async (fastify: FastifyInstance) => {
       return res.status(201).send({
         success: true,
         message: "User registered successfully",
-        user: userResponse,
+        data: userResponse,
       });
     },
   );
@@ -217,7 +225,9 @@ module.exports = async (fastify: FastifyInstance) => {
 
   fastify.get("/me", { preHandler: fastify.authenticate }, async (req, res) => {
     if (!req.user.role) throw new UnauthorizedError("User not found");
-    return res.status(200).send({ success: true, message: "OK", data: req.user.role });
+    return res
+      .status(200)
+      .send({ success: true, message: "OK", data: { id: req.user.id, role: req.user.role } });
   });
 
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
