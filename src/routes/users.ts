@@ -3,11 +3,12 @@ import { Role, Gender, ProfileStatus, EducationLevel } from "../entities/User";
 // noinspection ES6UnusedImports
 import { fastifyCookie } from "@fastify/cookie";
 import { Database } from "../datasource";
-const bcrypt = require("bcrypt");
 import { ValidateTIN } from "../services/ValidateTIN";
 import { NotificationService } from "../services/NotificationService";
 import { PoolService } from "../services/PoolService";
+import { ConflictError, NotFoundError, RequestError, UnauthorizedError } from "../services/ErrorService";
 
+const bcrypt = require("bcrypt");
 const validateTIN = new ValidateTIN();
 
 const signupSchema = {
@@ -29,6 +30,7 @@ const signupSchema = {
 const loginSchema = {
   body: {
     type: "object",
+    required: ["email", "password"],
     properties: {
       email: { type: "string", format: "email" },
       password: { type: "string", format: "password" },
@@ -130,55 +132,47 @@ module.exports = async (fastify: FastifyInstance) => {
     "/signup/:role",
     { schema: signupSchema },
     async (req, res) => {
-      const { email, phone, password, ...data } = req.body;
+      const { email, phone, password: rawPassword, ...data } = req.body;
       const userPool = PoolService.getUserPool(req.params.role);
       if (
         await Database.getRepository("User").findOne({
           where: [{ email }, { phone }],
         })
       ) {
-        return res
-          .status(409)
-          .send({ success: false, message: "User with this email or phone already exists" });
+        throw new ConflictError("Email or phone already in use");
       }
 
-      const hashedPassword = await bcrypt.hash(password, 12);
+      const hashedPassword = await bcrypt.hash(rawPassword, 12);
       let user;
+      Object.assign(data, { email, phone, password: hashedPassword });
       switch (req.params.role) {
         case Role.EMPLOYER:
           if (!req.body.tin) {
-            return res.status(400).send({ success: false, message: "TIN missing/invalid" });
+            throw new RequestError("TIN missing/invalid");
           }
           const valid = await validateTIN.isExists(req.body.tin.toString());
           user = userPool.create({
             ...data,
-            password: hashedPassword,
             verified: valid,
           });
           break;
         case Role.SPECIALIST:
           user = userPool.create({
             ...data,
-            password: hashedPassword,
           });
           break;
         default:
-          return res.status(400).send({ success: false, message: "Bad Request" });
+          throw new RequestError();
       }
 
-      try {
-        await userPool.save(user);
-        const { password, ...userResponse } = user;
-        await NotificationService.notifyValidationStatus(user.id, user.verified);
-        return res.status(201).send({
-          success: true,
-          message: "User registered successfully",
-          user: userResponse,
-        });
-      } catch (error) {
-        fastify.log.error(error);
-        return res.status(500).send({ message: "Internal Server Error" });
-      }
+      await userPool.save(user);
+      const { password, ...userResponse } = user;
+      await NotificationService.notifyValidationStatus(user.id, user.verified);
+      return res.status(201).send({
+        success: true,
+        message: "User registered successfully",
+        user: userResponse,
+      });
     },
   );
 
@@ -187,10 +181,10 @@ module.exports = async (fastify: FastifyInstance) => {
     const userPool = PoolService.getUserPool();
     const user = await userPool.findOne({ where: { email: data.email } });
     if (!user) {
-      return res.status(404).send({ success: false, message: "User not found" });
+      throw new NotFoundError("User not found");
     }
     if (!(await bcrypt.compare(data.password, user.password))) {
-      return res.status(401).send({ success: false, message: "Invalid Password" });
+      throw new UnauthorizedError("Invalid password");
     }
     const token = fastify.jwt.sign({ id: user.id, role: user.role });
     return res
@@ -206,31 +200,26 @@ module.exports = async (fastify: FastifyInstance) => {
   });
 
   fastify.post("/logout", { preHandler: fastify.authenticate }, async (req, res) => {
-    try {
-      if (!req.cookies.access_token) {
-        return res.status(400).send({ success: false, message: "No cookies provided" });
-      }
-      res
-        .clearCookie("access_token", {
-          httpOnly: true,
-          secure: true,
-          sameSite: "strict",
-          signed: true,
-          path: "/",
-        })
-        .status(200)
-        .send({ success: true, message: "Logged out" });
-    } catch (e) {
-      console.log(e);
-      return res.status(500).send({ success: false, message: "Internal server error" });
+    if (!req.cookies.access_token) {
+      throw new UnauthorizedError("Cookie not found");
     }
+    res
+      .clearCookie("access_token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        signed: true,
+        path: "/",
+      })
+      .status(200)
+      .send({ success: true, message: "Logged out" });
   });
 
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
     const userPool = PoolService.getUserPool();
     let user = await userPool.findOne({ where: { id: req.params.id } });
     if (!user) {
-      return res.status(404).send({ success: false, message: "User not found" });
+      throw new NotFoundError("User not found");
     }
     if (req.user.id === req.params.id) {
       const { password, ...fullData } = user as any;
@@ -283,7 +272,7 @@ module.exports = async (fastify: FastifyInstance) => {
       const userPool = PoolService.getUserPool(req.user.role);
       const user = await userPool.findOne({ where: { id: req.user.id } });
 
-      if (!user) return res.status(404).send({ success: false, message: "User not found" });
+      if (!user) throw new NotFoundError("User not found");
 
       const sanitizedData = sanitizeUpdateData(req.user.role, req.body);
 
@@ -293,14 +282,8 @@ module.exports = async (fastify: FastifyInstance) => {
       }
 
       Object.assign(user, sanitizedData);
-
-      try {
-        await userPool.save(user);
-        return res.status(204).send({ success: true, message: "Successfully Updated" });
-      } catch (err) {
-        console.log(err);
-        return res.status(500).send({ success: false, message: "Database Error" });
-      }
+      await userPool.save(user);
+      return res.status(204).send({ success: true, message: "Successfully Updated" });
     },
   );
 };

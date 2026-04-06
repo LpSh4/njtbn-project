@@ -14,7 +14,7 @@ console.log("Server started");
 if (!process.env.JWT_KEY || !process.env.COOKIE_KEY) {
   throw new Error(".env missing crucial info");
 }
-
+server.register(require("./plugins/errorHandler"));
 server.register(fastifyCookie, {
   secret: process.env.COOKIE_KEY,
 });

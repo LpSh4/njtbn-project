@@ -4,10 +4,17 @@ import { Role, User } from "../entities/User";
 import { Database } from "../datasource";
 import { Application, ApplicationStatus } from "../entities/Application";
 import { NotificationService } from "../services/NotificationService";
+import { ConflictError, ForbiddenError, NotFoundError } from "../services/ErrorService";
 
 interface viewQuery {
   status: ApplicationStatus;
 }
+
+// const calculateAge = (birthDate?: Date | string): number | null => {
+//   if (!birthDate) return null;
+//   const birthYear = new Date(birthDate).getFullYear();
+//   return new Date().getFullYear() - birthYear;
+// };
 
 module.exports = (fastify: FastifyInstance) => {
   fastify.post<{ Params: { vacancyId: string } }>(
@@ -15,47 +22,41 @@ module.exports = (fastify: FastifyInstance) => {
     { preHandler: fastify.authenticate },
     async (req, res) => {
       if (req.user.role === Role.EMPLOYER) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
+        throw new ForbiddenError("Forbidden");
       }
       const vacancyPool = Database.getRepository(Vacancy);
       const vacancy = await vacancyPool.findOne({ where: { id: req.params.vacancyId } });
       if (!vacancy) {
-        return res.status(404).send({ success: false, message: "Vacancy not found" });
+        throw new NotFoundError("Vacancy not found");
       }
       if ([VacancyStatus.CLOSED, VacancyStatus.PAUSED].includes(vacancy.status)) {
-        return res.status(409).send({ success: false, message: "Invalid Vacancy Status" });
+        throw new ConflictError("Invalid Vacancy Status");
       }
       const applicantId = req.user.id;
       const userPool = Database.getRepository(User);
       const user = await userPool.findOne({ where: { id: applicantId } });
       if (!user) {
-        return res.status(404).send({ success: false, message: "Specialist not found" });
+        throw new NotFoundError("Specialist not found");
       }
       const employerId = vacancy.managerId;
       if (!(await userPool.findOne({ where: { id: employerId } }))) {
-        return res.status(404).send({ success: false, message: "User not found" });
+        throw new NotFoundError("User not found");
       }
       const applicationPool = Database.getRepository(Application);
       if (
         await applicationPool.findOne({
           where: { applicantId: req.user.id, vacancyId: req.params.vacancyId },
         })
-      ) {
-        return res.status(409).send({ success: false, message: "Application already exists" });
-      }
+      )
+        throw new ConflictError("Application Already Exists");
       const application = applicationPool.create({
         applicantId,
         employerId,
         vacancyId: vacancy.id,
       });
-
-      try {
-        await applicationPool.save(application);
-        await NotificationService.notifyNewApplication(user.name, employerId);
-        return res.status(201).send({ success: true, message: "Created", data: application });
-      } catch (e) {
-        return res.status(500).send({ success: false, message: "Internal Server Error" });
-      }
+      await applicationPool.save(application);
+      await NotificationService.notifyNewApplication(user.name, employerId);
+      return res.status(201).send({ success: true, message: "Created", data: application });
     },
   );
 
@@ -68,10 +69,10 @@ module.exports = (fastify: FastifyInstance) => {
         where: { id: req.params.vacancyId },
       });
       if (!vacancy) {
-        return res.status(404).send({ success: false, message: "Vacancy not found" });
+        throw new NotFoundError("Vacancy not found");
       }
       if (req.user.id !== vacancy.managerId) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
+        throw new ForbiddenError("Forbidden");
       }
       const applicationRepo = Database.getRepository(Application);
       const applications = await applicationRepo.find({
@@ -80,7 +81,7 @@ module.exports = (fastify: FastifyInstance) => {
       });
 
       if (applications.length === 0) {
-        return res.status(404).send({ success: false, message: "No applications found" });
+        throw new NotFoundError("No applications found");
       }
 
       const data = applications.map((app: Application) => {
@@ -171,7 +172,7 @@ module.exports = (fastify: FastifyInstance) => {
     },
     async (req, res) => {
       if (req.user.role !== Role.EMPLOYER) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
+        throw new ForbiddenError("Forbidden");
       }
       const applicationPool = Database.getRepository(Application);
       const application = await applicationPool.findOne({
@@ -180,24 +181,24 @@ module.exports = (fastify: FastifyInstance) => {
         },
       });
       if (!application) {
-        return res.status(404).send({ success: false, message: "Not Found" });
+        throw new NotFoundError("Not Found");
       }
       if (application.employerId !== req.user.id) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
+        throw new ForbiddenError("Forbidden");
       }
       Object.assign(application, { status: req.body.status ? req.body.status : application.status });
 
+      await applicationPool.save(application);
       try {
-        await applicationPool.save(application);
         await NotificationService.notifyApplicationStatusChange(
           application.applicantId,
           application.status,
           req.body.dueDate ? req.body.dueDate : undefined,
         );
-        return res.status(200).send({ success: true, message: "OK", data: application });
       } catch (e) {
-        return res.status(500).send({ success: false, message: "Internal Server Error" });
+        console.log(e);
       }
+      return res.status(200).send({ success: true, message: "OK", data: application });
     },
   );
 
@@ -206,24 +207,20 @@ module.exports = (fastify: FastifyInstance) => {
     { preHandler: fastify.authenticate },
     async (req, res) => {
       if (req.user.role === Role.EMPLOYER) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
+        throw new ForbiddenError("Forbidden");
       }
       const applicationPool = Database.getRepository(Application);
       const application = await applicationPool.findOne({
         where: { id: req.params.id },
       });
       if (!application) {
-        return res.status(404).send({ success: false, message: "Not Found" });
+        throw new NotFoundError("Not Found");
       }
       if (req.user.id !== application.applicantId) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
+        throw new ForbiddenError("Forbidden");
       }
-      try {
-        await applicationPool.softDelete(application.id);
-        return res.status(204).send({ success: true, message: "OK", data: application });
-      } catch (e) {
-        return res.status(500).send({ success: false, message: "Internal Server Error" });
-      }
+      await applicationPool.softDelete(application.id);
+      return res.status(204).send({ success: true, message: "OK", data: application });
     },
   );
 };

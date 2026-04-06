@@ -1,11 +1,13 @@
 import { FastifyInstance } from "fastify";
 // noinspection ES6UnusedImports
 import { fastifyCookie } from "@fastify/cookie";
-import { Role, User } from "../entities/User";
+import { Role } from "../entities/User";
 import { Database } from "../datasource";
 import { Resume, ResumeStatus, ResumeWorkFormat } from "../entities/Resume";
 import { Brackets } from "typeorm";
 import { NotificationService } from "../services/NotificationService";
+import { PoolService } from "../services/PoolService";
+import { ForbiddenError, NotFoundError } from "../services/ErrorService";
 
 const createSchema = {
   body: {
@@ -122,45 +124,23 @@ module.exports = async (fastify: FastifyInstance) => {
     "/create",
     { preHandler: fastify.authenticate, schema: createSchema },
     async (req, res) => {
-      if (req.user.role === Role.EMPLOYER) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
-      }
-      const userPool = Database.getRepository(User);
+      if (req.user.role === Role.EMPLOYER) throw new ForbiddenError();
+
+      const userPool = PoolService.getUserPool();
       const user = await userPool.findOne({ where: { id: req.user.id } });
-      if (!user) {
-        return res.status(404).send({ success: false, message: "User not found" });
-      }
-      const {
-        profession,
-        name,
-        surname,
-        experience,
-        experienceDescription,
-        skills,
-        desiredSalaryFrom,
-        city,
-        workFormat,
-      } = req.body;
-      const resumePool = Database.getRepository(Resume);
+      if (!user) throw new NotFoundError("User not found");
+
+      const resumePool = PoolService.getResumePool();
       const resume = resumePool.create({
+        ...req.body,
         specialistId: req.user.id,
-        profession,
-        name: name ?? user.name,
-        surname: surname ?? user.surname,
-        experience: experience ?? 0,
-        experienceDescription,
-        skills,
-        desiredSalaryFrom: desiredSalaryFrom ?? 0,
-        city: city ?? user.city,
-        workFormat,
+        name: req.body.name ?? user.name,
+        surname: req.body.surname ?? user.surname,
+        city: req.body.city ?? user.city,
       });
-      try {
-        await resumePool.save(resume);
-        await NotificationService.notifyCreatedContent("Resume", resume.profession, req.user.id);
-        return res.status(201).send({ success: true, message: "Resume created", data: resume });
-      } catch (e) {
-        return res.status(500).send({ success: false, message: "Internal server error" });
-      }
+      await resumePool.save(resume);
+      await NotificationService.notifyCreatedContent("Resume", resume.profession, req.user.id);
+      return res.status(201).send({ success: true, message: "Resume created", data: resume });
     },
   );
 
@@ -168,35 +148,15 @@ module.exports = async (fastify: FastifyInstance) => {
     "/:id",
     { preHandler: fastify.authenticate, schema: updateSchema },
     async (req, res) => {
-      const resumePool = Database.getRepository(Resume);
+      const resumePool = PoolService.getResumePool();
       const resume = await resumePool.findOne({ where: { id: req.params.id } });
-      if (!resume) {
-        return res.status(404).send({ success: false, message: "Resume not found" });
-      }
-      if (!req.user.id === resume.specialistId) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
-      }
-      const data = req.body;
-      const update = {
-        profession: data.profession ? data.profession : resume.profession,
-        experience: data.experience ? data.experience : resume.experience,
-        experienceDescription: data.experienceDescription
-          ? data.experienceDescription
-          : resume.experienceDescription,
-        skills: data.skills ? data.skills : resume.skills,
-        desiredSalaryFrom: data.desiredSalaryFrom ? data.desiredSalaryFrom : resume.desiredSalaryFrom,
-        city: data.city ? data.city : resume.city,
-        workFormat: data.workFormat ? data.workFormat : resume.workFormat,
-        status: data.status ? data.status : resume.status,
-      };
 
-      Object.assign(resume, update);
-      try {
-        await resumePool.save(resume);
-        return res.status(204).send({ success: true, message: "OK", data: resume });
-      } catch (e) {
-        return res.status(500).send({ success: false, message: "Internal server error" });
-      }
+      if (!resume) throw new NotFoundError("Resume not found");
+      if (!req.user.id === resume.specialistId) throw new ForbiddenError();
+
+      Object.assign(resume, req.body);
+      await resumePool.save(resume);
+      return res.status(204).send({ success: true, message: "OK", data: resume });
     },
   );
 
@@ -204,21 +164,20 @@ module.exports = async (fastify: FastifyInstance) => {
     "/viewprofile/:id",
     { preHandler: fastify.authenticate },
     async (req, res) => {
-      const userPool = Database.getRepository(User);
+      const userPool = PoolService.getUserPool();
+
       const user = await userPool.findOne({ where: { id: req.params.id } });
-      if (!user) {
-        return res.status(404).send({ success: false, message: "User not found" });
-      }
-      const resumePool = Database.getRepository(Resume);
+      if (!user) throw new NotFoundError("User not found");
+
+      const resumePool = PoolService.getResumePool();
       let resumes = await resumePool.find({
         where: {
           specialistId: req.params.id,
           ...(req.user.id !== req.params.id ? { status: ResumeStatus.ACTIVE } : {}),
         },
       });
-      if (resumes.length < 1) {
-        return res.status(404).send({ success: false, message: "Resumes not found" });
-      }
+
+      if (resumes.length < 1) throw new NotFoundError("Resume not found");
       resumes = resumes.map((resume: Resume) => {
         const { workFormat, profession, desiredSalaryFrom, id } = resume;
 
@@ -254,7 +213,7 @@ module.exports = async (fastify: FastifyInstance) => {
     "/:id",
     { preHandler: fastify.authenticate },
     async (req, res) => {
-      const resumePool = Database.getRepository(Resume);
+      const resumePool = PoolService.getResumePool();
       const resume = await resumePool.findOne({ where: { id: req.params.id } });
       if (!resume) {
         return res.status(404).send({ success: false, message: "Resume not found" });
@@ -265,7 +224,7 @@ module.exports = async (fastify: FastifyInstance) => {
       if (req.user.id === resume.specialistId) {
         return res.status(200).send({ success: true, message: "OK", data: resume });
       }
-      const userPool = Database.getRepository(User);
+      const userPool = PoolService.getUserPool();
       const user = await userPool.findOne({ where: { id: resume.specialistId } });
       if (!user) {
         return res.status(404).send({ success: false, message: "User not found" });
@@ -298,7 +257,7 @@ module.exports = async (fastify: FastifyInstance) => {
     "/:id",
     { preHandler: fastify.authenticate },
     async (req, res) => {
-      const resumePool = Database.getRepository(Resume);
+      const resumePool = PoolService.getResumePool();
       const resume = await resumePool.findOne({ where: { id: req.params.id } });
       if (!resume) {
         return res.status(404).send({ success: false, message: "Resume not found" });
