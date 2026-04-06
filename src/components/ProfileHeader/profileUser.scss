@@ -1,0 +1,57 @@
+@use "../../styles/mixins";
+
+.user{
+  padding: 19px 16px 19px 23px;
+  max-width: 1035px;
+  width: 100%;
+  @include mixins.flex(row, space-between,start);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 30px;
+  @media (max-width: 620px) {
+    @include mixins.flex( column-reverse);
+    gap: 20px;
+  }
+
+  &__redact{
+    @include mixins.flex(row,start,start);
+    gap: 17px;
+  }
+
+  &__form{
+    @include mixins.flex(column, start,start);
+    gap: 51px;
+    p{
+      font-size: 32px;
+    }
+
+    p>input{
+      font-size: 23px;
+      color:rgba(0, 0, 0, 0.6);
+    }
+
+    button{
+      width: 200px;
+      height: 42px;
+      background-color: #3914AF;
+      color: white;
+      border-radius: 21px;
+
+    }
+  }
+
+  &__input-field{
+    @include mixins.flex(column, start,start);
+    gap: 11px;
+  }
+
+  &__profile{
+    @include mixins.flex(row,start,start);
+    gap: 13px;
+  }
+
+  &__url{
+    padding: 4px 0 0 0;
+    @include mixins.flex(column);
+    gap: 17px;
+  }
+}

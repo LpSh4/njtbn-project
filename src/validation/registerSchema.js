@@ -32,11 +32,11 @@ export const getRegisterSchema = (role) =>
             .oneOf([yup.ref("password")], "Пароли не совпадают")
             .required("Подтвердите пароль"),
 
-        inn:
-            role === "employer"
-                ? yup
-                    .string()
-                    .length(12, "ИНН должен быть 12 цифр")
-                    .required("Введите ИНН")
-                : yup.string().notRequired(),
+            tin:
+                role === "employer"
+                    ? yup
+                        .string()
+                        .matches(/^\d{10,12}$/, "ИНН должен содержать 10-12 цифр")
+                        .required("Введите ИНН")
+                    : yup.string().notRequired(),
     });

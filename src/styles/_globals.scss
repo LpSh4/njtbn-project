@@ -1,5 +1,5 @@
 *{
-  color: white;
+  color: #000000;
 }
 
 body {
@@ -19,3 +19,11 @@ body>*{
   pointer-events: none;
   user-select: none;
 }
+
+header>*{
+  color: #ffffff;
+  a{
+    color: #ffffff;
+  }
+}
+

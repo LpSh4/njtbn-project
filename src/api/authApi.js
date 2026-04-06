@@ -1,11 +1,17 @@
-import axios from "axios";
-
-const API_URL = "https://api.ryban.ru/api";
+import { api } from "./axios";
 
 export const registerUser = (role, data) => {
-    return axios.post(`${API_URL}/users/signup/${role}`, data);
+    return api.post(`/users/signup/${role}`, data);
 };
 
 export const loginUser = (data) => {
-    return axios.post(`${API_URL}/users/login`, data);
+    return api.post(`/users/login`, data);
+};
+
+export const getMe = () => {
+    return api.get(`/users/me`);
+};
+
+export const getUser = (me) => {
+    return api.get(`/users/${me}`);
 };

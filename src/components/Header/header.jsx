@@ -1,27 +1,27 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext.jsx";
 import "./header.scss";
-import { Link, useNavigate } from "react-router-dom";
 import logo from "./icons/logo.png";
 import menu from "./icons/Menu.png";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Header({ setIsLoginOpen }) {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
 
-    const isAuth = !!localStorage.getItem("token");
-
+    const { isAuth, logout } = useContext(AuthContext);
+    const location = useLocation();
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        window.location.reload();
+        logout();
+        navigate("/");
     };
-
     return (
         <header className="header">
             <div className="header__element-cont">
-                <Link to="/" className="header__img">
-                    <img src={logo} alt="" />
-                </Link>
 
+                <div className="header__img">
+                    <img src={logo} alt="" />
+                </div>
                 <nav className="header__nav">
                     <ul className="header__list">
                         <li><a href="">О компании</a></li>
@@ -38,14 +38,12 @@ export default function Header({ setIsLoginOpen }) {
                     </button>
                 ) : (
                     <>
-                        <button onClick={() => navigate("/profile")}>
-                            Профиль
-                        </button>
-
-                        <button onClick={handleLogout}>
-                            Выйти
-                        </button>
-                    </>
+                        {location.pathname !== "/profile" && (
+                                <button onClick={() => navigate("/profile")}>
+                                    Профиль
+                                </button>
+                        )}
+                        <button onClick={handleLogout}>Выйти</button>                    </>
                 )}
             </div>
 
@@ -69,13 +67,15 @@ export default function Header({ setIsLoginOpen }) {
                         ) : (
                             <>
                                 <li className="mobile-menu__item">
-                                    <button onClick={() => navigate("/profile")}>
-                                        Профиль
-                                    </button>
+                                    {location.pathname !== "/profile" && (
+                                        <button onClick={() => navigate("/profile")}>
+                                            Профиль
+                                        </button>
+                                    )}
                                 </li>
 
                                 <li className="mobile-menu__item">
-                                    <button onClick={handleLogout}>
+                                    <button onClick={logout}>
                                         Выйти
                                     </button>
                                 </li>

@@ -5,8 +5,15 @@ import { getRegisterSchema } from "../../validation/registerSchema.js";
 import { PatternFormat } from "react-number-format";
 import { Controller } from "react-hook-form";
 import { registerUser } from "../../api/authApi";
+import { loginUser } from "../../api/authApi";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext.jsx";
+
 
 const RegistrationForm = ({ role }) => {
+    const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
     const {
         register,
         handleSubmit,
@@ -14,6 +21,15 @@ const RegistrationForm = ({ role }) => {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(getRegisterSchema(role)),
+        defaultValues: {
+            email: "",
+            phone: "",
+            name: "",
+            surname: "",
+            password: "",
+            confirmPassword: "",
+            tin: "",
+        },
     });
 
     const onSubmit = async (data) => {
@@ -27,17 +43,24 @@ const RegistrationForm = ({ role }) => {
                 ...(role === "employer" && { tin: data.tin }),
             };
 
-            const res = await registerUser(role, payload);
+            await registerUser(role, payload);
 
-            console.log("SUCCESS:", res.data);
-            alert("Регистрация успешна");
+            await loginUser({
+                email: data.email,
+                password: data.password,
+            });
+
+
+            login();
+
+            navigate("/profile");
 
         } catch (e) {
-            console.error("ERROR FULL:", e);
+            console.error(e);
             alert(e.response?.data?.message || "Ошибка регистрации");
         }
     };
-
+    console.log(errors);
     return (
         <section className="employer">
             <section className="employer__cont">
@@ -66,14 +89,7 @@ const RegistrationForm = ({ role }) => {
                                         mask="_"
                                         placeholder="8 (9__) ___-__-__"
                                         onValueChange={(values) => {
-                                            let phone = values.value;
-
-                                            if (phone.length === 11) {
-                                                phone = "89" + phone.slice(2);
-                                                field.onChange(phone);
-                                            } else {
-                                                field.onChange("");
-                                            }
+                                            field.onChange(values.value);
                                         }}
                                     />
                                 )}
@@ -112,7 +128,7 @@ const RegistrationForm = ({ role }) => {
                         {role === "employer" && (
                             <p>
                                 <label>ИНН</label>
-                                <input {...register("tin")} />
+                                <input maxLength={12} minLength={10} {...register("tin")} />
                                 <span className="error">{errors.tin?.message}</span>
                             </p>
                         )}

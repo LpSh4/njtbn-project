@@ -8,6 +8,7 @@ import RegistrationChoose from "./pages/RegistrationChoose/RegistrationChoose.js
 import { ModalLogin } from "./components/ModalLogin/modalLogin.jsx";
 import RegistrationEmployer from "./pages/RegistrationEmployer/RegistrationEmployer.jsx";
 import {RegistrationSpecialist} from "./pages/RegistrationSpecialist/RegistrationSpecialist.jsx";
+import {Profile} from "./components/profile/profile.jsx";
 
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
                     <Route path="/registerChoose" element={<RegistrationChoose />} />
                     <Route path="/registerEmployer" element={<RegistrationEmployer />} />
                  <Route path="/registerSpecialist" element={<RegistrationSpecialist />} />
+                 <Route path="/profile" element={<Profile/>}/>
                 </Routes>
             </main>
 

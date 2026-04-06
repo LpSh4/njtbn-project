@@ -1,0 +1,6 @@
+@use "../../styles/mixins";
+
+.profile {
+  margin-top: 46px;
+  @include mixins.flex()
+}
