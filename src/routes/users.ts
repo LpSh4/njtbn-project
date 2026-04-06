@@ -215,6 +215,11 @@ module.exports = async (fastify: FastifyInstance) => {
       .send({ success: true, message: "Logged out" });
   });
 
+  fastify.get("/me", { preHandler: fastify.authenticate }, async (req, res) => {
+    if (!req.user.role) throw new UnauthorizedError("User not found");
+    return res.status(200).send({ success: true, message: "OK", data: req.user.role });
+  });
+
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
     const userPool = PoolService.getUserPool();
     let user = await userPool.findOne({ where: { id: req.params.id } });

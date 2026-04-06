@@ -38,6 +38,19 @@ export class NotificationService {
     });
   }
 
+  static async notifyUpdatedContent(
+    content: "Resume" | "Vacancy",
+    contentName: string,
+    recipientId: string,
+  ) {
+    return this.create({
+      recipientId,
+      title: `${content} updated`,
+      description: `Your ${contentName} ${content} has been updated`,
+      type: NotificationType.SYSTEM_NOTIFICATION,
+    });
+  }
+
   static async notifyValidationStatus(recipientId: string, validated: boolean) {
     return this.create({
       recipientId,

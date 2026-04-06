@@ -2,12 +2,11 @@ import { FastifyInstance } from "fastify";
 // noinspection ES6UnusedImports
 import { fastifyCookie } from "@fastify/cookie";
 import { Role } from "../entities/User";
-import { Database } from "../datasource";
 import { Resume, ResumeStatus, ResumeWorkFormat } from "../entities/Resume";
-import { Brackets } from "typeorm";
 import { NotificationService } from "../services/NotificationService";
 import { PoolService } from "../services/PoolService";
 import { ForbiddenError, NotFoundError } from "../services/ErrorService";
+import { ResumeSearchQuery, SearchService } from "../services/SearchService";
 
 const createSchema = {
   body: {
@@ -107,18 +106,6 @@ interface updateBody {
   status?: ResumeStatus;
 }
 
-interface SearchQuery {
-  page: number;
-  keywords?: string;
-  city?: string;
-  salaryFrom?: number;
-  salaryTo?: number;
-  expFrom?: number;
-  expTo?: number;
-  workFormat?: ResumeWorkFormat;
-  sortBy: "least_popular" | "most_popular" | "least_paid" | "most_paid" | "fresh";
-}
-
 module.exports = async (fastify: FastifyInstance) => {
   fastify.post<{ Body: createBody }>(
     "/create",
@@ -177,7 +164,8 @@ module.exports = async (fastify: FastifyInstance) => {
         },
       });
 
-      if (resumes.length < 1) throw new NotFoundError("Resume not found");
+      if (!resumes.length) throw new NotFoundError("Resumes not found");
+
       resumes = resumes.map((resume: Resume) => {
         const { workFormat, profession, desiredSalaryFrom, id } = resume;
 
@@ -215,20 +203,15 @@ module.exports = async (fastify: FastifyInstance) => {
     async (req, res) => {
       const resumePool = PoolService.getResumePool();
       const resume = await resumePool.findOne({ where: { id: req.params.id } });
-      if (!resume) {
-        return res.status(404).send({ success: false, message: "Resume not found" });
-      }
-      if (resume.status === ResumeStatus.ARCHIVED && req.user.id !== resume.specialistId) {
-        return res.status(403).send({ success: false, mmessage: "Resume archived" });
-      }
+      if (!resume) throw new NotFoundError("Resume not found");
+      if (resume.status === ResumeStatus.ARCHIVED && req.user.id !== resume.specialistId)
+        throw new ForbiddenError("Resume archived");
       if (req.user.id === resume.specialistId) {
         return res.status(200).send({ success: true, message: "OK", data: resume });
       }
       const userPool = PoolService.getUserPool();
       const user = await userPool.findOne({ where: { id: resume.specialistId } });
-      if (!user) {
-        return res.status(404).send({ success: false, message: "User not found" });
-      }
+      if (!user) throw new NotFoundError("User not found");
       await resumePool.increment({ id: resume.id }, "views", 1);
       const compiledData = {
         user: {
@@ -258,105 +241,22 @@ module.exports = async (fastify: FastifyInstance) => {
     { preHandler: fastify.authenticate },
     async (req, res) => {
       const resumePool = PoolService.getResumePool();
+
       const resume = await resumePool.findOne({ where: { id: req.params.id } });
-      if (!resume) {
-        return res.status(404).send({ success: false, message: "Resume not found" });
-      }
-      if (!req.user.id === resume.specialistId) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
-      }
-      try {
-        const update = await resumePool.softDelete(req.params.id);
-        return res.status(204).send({ success: true, message: "OK", data: update });
-      } catch (e) {
-        return res.status(500).send({ success: false, message: "Internal server error" });
-      }
+      if (!resume) throw new NotFoundError("Resume not found");
+      if (!req.user.id === resume.specialistId) throw new ForbiddenError();
+
+      await resumePool.softDelete(req.params.id);
+      return res.status(204).send();
     },
   );
 
-  fastify.get<{ Querystring: SearchQuery }>(
+  fastify.get<{ Querystring: ResumeSearchQuery }>(
     "/search",
     { preHandler: fastify.authenticate, schema: searchSchema },
     async (req, res) => {
-      const { keywords, city, salaryFrom, salaryTo, expFrom, expTo, workFormat, sortBy } = req.query;
-
-      const page = Number(req.query.page) || 1;
-      const limit = 7;
-      const skip = (page - 1) * limit;
-
-      const query = Database.getRepository(Resume)
-        .createQueryBuilder("resume")
-        .where("resume.workFormat = :workFormat", { workFormat });
-
-      if (keywords) {
-        const words = keywords.split(/\s+/).filter(Boolean);
-        query.andWhere(
-          new Brackets((qb) => {
-            words.forEach((word, index) => {
-              const paramName = `word${index}`;
-              const searchPattern = `%${word}%`;
-
-              if (index === 0) {
-                qb.where("resume.profession ILIKE :word0", { word0: searchPattern }).orWhere(
-                  "resume.experienceDescription ILIKE :word0",
-                  { word0: searchPattern },
-                );
-              } else {
-                qb.orWhere(`resume.profession ILIKE :${paramName}`, {
-                  [paramName]: searchPattern,
-                }).orWhere(`resume.experienceDescription ILIKE :${paramName}`, {
-                  [paramName]: searchPattern,
-                });
-              }
-            });
-          }),
-        );
-      }
-      query.andWhere("resume.status = :st", { st: ResumeStatus.ACTIVE });
-      if (city) {
-        query.andWhere("resume.city ILIKE :city", { city: `%${city}%` });
-      }
-      if (salaryFrom) query.andWhere("resume.desired_salary_from >= :sFrom", { sFrom: salaryFrom });
-      if (salaryTo) query.andWhere("resume.desired_salary_from <= :sTo", { sTo: salaryTo });
-      if (expFrom) query.andWhere("resume.experience >= :eFrom", { eFrom: expFrom });
-      if (expTo) query.andWhere("resume.experience <= :eTo", { eTo: expTo });
-
-      switch (sortBy) {
-        case "most_popular":
-          query.orderBy("resume.views", "DESC");
-          break;
-        case "least_popular":
-          query.orderBy("resume.views", "ASC");
-          break;
-        case "most_paid":
-          query.orderBy("resume.desired_salary_from", "DESC");
-          break;
-        case "least_paid":
-          query.orderBy("resume.desired_salary_from", "ASC");
-          break;
-        case "fresh":
-        default:
-          query.orderBy("resume.createdAt", "DESC");
-          break;
-      }
-
-      try {
-        const [results, total] = await query.take(limit).skip(skip).getManyAndCount();
-
-        return res.status(200).send({
-          success: true,
-          message: "OK",
-          meta: {
-            total,
-            page,
-            lastPage: Math.ceil(total / limit),
-          },
-          data: results,
-        });
-      } catch (e) {
-        console.log(e);
-        return res.status(500).send({ success: false, message: "Internal server error" });
-      }
+      const result = await SearchService.ResumeSearch(req.query);
+      return res.status(200).send({ success: true, ...result });
     },
   );
 };

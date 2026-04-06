@@ -4,8 +4,11 @@ import { fastifyCookie } from "@fastify/cookie";
 import { Role, User } from "../entities/User";
 import { Database } from "../datasource";
 import { Vacancy, VacancyStatus, WorkFormat, WorkingHours, WorkSchedule } from "../entities/Vacancy";
-import { Brackets, Not } from "typeorm";
+import { Not } from "typeorm";
 import { NotificationService } from "../services/NotificationService";
+import { PoolService } from "../services/PoolService";
+import { ForbiddenError, NotFoundError } from "../services/ErrorService";
+import { SearchService, VacancySearchQuery } from "../services/SearchService";
 
 const createSchema = {
   body: {
@@ -108,64 +111,27 @@ interface updateBody {
   status?: VacancyStatus;
 }
 
-interface SearchQuery {
-  page: number;
-  keywords?: string;
-  city?: string;
-  salaryFrom?: number;
-  salaryTo?: number;
-  expFrom?: number;
-  expTo?: number;
-  workFormat?: WorkFormat;
-  workSchedule?: string;
-  workingHours?: string;
-  sortBy: "least_popular" | "most_popular" | "least_paid" | "most_paid" | "fresh";
-}
-
 module.exports = async (fastify: FastifyInstance) => {
   fastify.post<{ Body: createBody }>(
     "/create",
     { preHandler: fastify.authenticate, schema: createSchema },
     async (req, res) => {
-      const vacancyPool = Database.getRepository(Vacancy);
-      const {
-        profession,
-        workFormat,
-        workSchedule,
-        workingHours,
-        salaryFrom,
-        salaryTo,
-        experience,
-        city,
-        description,
-        deadLine,
-        requiredSkills,
-      } = req.body;
-      if (req.user.role === Role.SPECIALIST) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
-      }
+      const vacancyPool = PoolService.getVacancyPool();
+
+      if (req.user.role === Role.SPECIALIST) throw new ForbiddenError();
+
       const vacancy = vacancyPool.create({
+        ...req.body,
         managerId: req.user.id,
-        profession,
-        workFormat,
-        workSchedule,
-        workingHours,
-        experience,
-        salaryFrom: salaryFrom ? salaryFrom : null,
-        salaryTo: salaryTo ? salaryTo : null,
-        city,
-        description: description ?? "",
-        deadLine: deadLine,
-        requiredSkills: requiredSkills ? requiredSkills : [],
+        salaryFrom: req.body.salaryFrom ? req.body.salaryFrom : null,
+        salaryTo: req.body.salaryTo ? req.body.salaryTo : null,
+        description: req.body.description ?? "",
+        requiredSkills: req.body.requiredSkills ? req.body.requiredSkills : [],
       });
 
-      try {
-        await vacancyPool.save(vacancy);
-        await NotificationService.notifyCreatedContent("Vacancy", vacancy.profession, req.user.id);
-        return res.status(201).send({ success: true, message: "OK", data: vacancy });
-      } catch (e) {
-        return res.status(500).send({ success: false, message: "Internal server error" });
-      }
+      await vacancyPool.save(vacancy);
+      await NotificationService.notifyCreatedContent("Vacancy", vacancy.profession, req.user.id);
+      return res.status(201).send({ success: true, message: "OK", data: vacancy });
     },
   );
 
@@ -173,55 +139,17 @@ module.exports = async (fastify: FastifyInstance) => {
     "/:id",
     { preHandler: fastify.authenticate, schema: updateSchema },
     async (req, res) => {
-      const vacancyPool = Database.getRepository(Vacancy);
+      const vacancyPool = PoolService.getVacancyPool();
       const vacancy = await vacancyPool.findOne({
         where: { id: req.params.id },
       });
 
-      if (!vacancy) {
-        return res.status(404).send({ success: false, message: "Not Found" });
-      }
-      if (req.user.id !== vacancy.managerId) {
-        return res.status(403).send({ success: false, message: "Forbidden" });
-      }
+      if (!vacancy) throw new NotFoundError("Vacancy not found");
+      if (req.user.id !== vacancy.managerId) throw new ForbiddenError();
 
-      const {
-        profession,
-        workFormat,
-        workSchedule,
-        workingHours,
-        salaryFrom,
-        salaryTo,
-        experience,
-        city,
-        description,
-        deadLine,
-        requiredSkills,
-        status,
-      } = req.body;
-      const update = {
-        profession: profession ? profession : vacancy.profession,
-        workFormat: workFormat ? workFormat : vacancy.workFormat,
-        workSchedule: workSchedule ? workSchedule : vacancy.workSchedule,
-        workingHours: workingHours ? workingHours : vacancy.workingHours,
-        salaryFrom: salaryFrom ? salaryFrom : vacancy.salaryFrom,
-        salaryTo: salaryTo ? salaryTo : vacancy.salaryTo,
-        experience: experience ? experience : vacancy.experience,
-        city: city ? city : vacancy.city,
-        description: description ? description : vacancy.description,
-        deadLine: deadLine ? deadLine : vacancy.deadLine,
-        requiredSkills: requiredSkills ? requiredSkills : vacancy.requiredSkills,
-        status: status ? status : vacancy.status,
-      };
-
-      Object.assign(vacancy, update);
-
-      try {
-        await vacancyPool.save(vacancy);
-        return res.status(200).send({ success: true, message: "OK", data: vacancy });
-      } catch (e) {
-        return res.status(500).send({ success: false, message: "Internal server error" });
-      }
+      Object.assign(vacancy, req.body);
+      await vacancyPool.save(vacancy);
+      return res.status(200).send({ success: true, message: "OK", data: vacancy });
     },
   );
 
@@ -234,7 +162,7 @@ module.exports = async (fastify: FastifyInstance) => {
       if (!user) {
         return res.status(404).send({ success: false, message: "User not found" });
       }
-      const vacancyPool = Database.getRepository(Vacancy);
+      const vacancyPool = PoolService.getVacancyPool();
       let vacancies = await vacancyPool.find({
         where: {
           managerId: req.params.id,
@@ -282,7 +210,7 @@ module.exports = async (fastify: FastifyInstance) => {
     "/:id",
     { preHandler: fastify.authenticate },
     async (req, res) => {
-      const vacancyPool = Database.getRepository(Vacancy);
+      const vacancyPool = PoolService.getVacancyPool();
       const vacancy = await vacancyPool.findOne({ where: { id: req.params.id } });
       if (!vacancy) {
         return res.status(404).send({ success: false, message: "Vacancy not found" });
@@ -320,97 +248,12 @@ module.exports = async (fastify: FastifyInstance) => {
     },
   );
 
-  fastify.get<{ Querystring: SearchQuery }>("/search", { schema: searchSchema }, async (req, res) => {
-    const {
-      page,
-      keywords,
-      city,
-      salaryFrom,
-      salaryTo,
-      expFrom,
-      expTo,
-      workFormat,
-      workSchedule,
-      workingHours,
-      sortBy,
-    } = req.query;
-
-    const limit = 12;
-    const skip = (Number(page) - 1) * limit;
-
-    const vacancyPool = Database.getRepository(Vacancy);
-    const query = vacancyPool
-      .createQueryBuilder("vacancy")
-      .where("vacancy.workFormat = :workFormat", { workFormat: workFormat || WorkFormat.OFFICE });
-
-    if (keywords) {
-      const words = keywords.split(/\s+/).filter(Boolean);
-      query.andWhere(
-        new Brackets((qb) => {
-          words.forEach((word, index) => {
-            const param = `word${index}`;
-            const pattern = `%${word}%`;
-            if (index === 0) {
-              qb.where("vacancy.profession ILIKE :word0", { word0: pattern }).orWhere(
-                "vacancy.description ILIKE :word0",
-                { word0: pattern },
-              );
-            } else {
-              qb.orWhere(`vacancy.profession ILIKE :${param}`, { [param]: pattern }).orWhere(
-                `vacancy.description ILIKE :${param}`,
-                { [param]: pattern },
-              );
-            }
-          });
-        }),
-      );
-    }
-    query.andWhere("vacancy.status = :st", { st: VacancyStatus.OPEN });
-    if (city) {
-      query.andWhere("vacancy.city ILIKE :city", { city: `%${city}%` });
-    }
-    if (salaryFrom) query.andWhere("vacancy.salary_from >= :sFrom", { sFrom: salaryFrom });
-    if (salaryTo) query.andWhere("vacancy.salary_to <= :sTo", { sTo: salaryTo });
-    if (expFrom) query.andWhere("vacancy.experience >= :eFrom", { eFrom: expFrom });
-    if (expTo) query.andWhere("vacancy.experience <= :eTo", { eTo: expTo });
-    if (workFormat) query.andWhere("vacancy.work_format = :wf", { wf: workFormat });
-    if (workSchedule) query.andWhere("vacancy.work_schedule = :ws", { ws: workSchedule });
-    if (workingHours) query.andWhere("vacancy.working_hours = :wh", { wh: workingHours });
-
-    switch (sortBy) {
-      case "most_popular":
-        query.orderBy("vacancy.views", "DESC");
-        break;
-      case "least_popular":
-        query.orderBy("vacancy.views", "ASC");
-        break;
-      case "most_paid":
-        query.orderBy("vacancy.salary_to", "DESC");
-        break;
-      case "least_paid":
-        query.orderBy("vacancy.salary_from", "ASC");
-        break;
-      case "fresh":
-      default:
-        query.orderBy("vacancy.createdAt", "DESC");
-        break;
-    }
-
-    try {
-      const [results, total] = await query.take(limit).skip(skip).getManyAndCount();
-
-      return res.status(200).send({
-        success: true,
-        meta: {
-          total,
-          page,
-          lastPage: Math.ceil(total / limit) || 0,
-        },
-        data: results,
-      });
-    } catch (e) {
-      fastify.log.error(e);
-      return res.status(500).send({ success: false, message: "Internal server error" });
-    }
-  });
+  fastify.get<{ Querystring: VacancySearchQuery }>(
+    "/search",
+    { schema: searchSchema },
+    async (req, res) => {
+      const results = await SearchService.VacancySearch(req.query);
+      return res.status(200).send({ success: true, message: "OK", ...results });
+    },
+  );
 };
