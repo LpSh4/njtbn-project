@@ -12,13 +12,13 @@ export class NotificationService {
     });
   }
 
-  static async notifyStatusChange(recipientId: string, newStatus: string, dueDate?: string) {
+  static async notifyApplicationStatusChange(recipientId: string, newStatus: string, dueDate?: string) {
     return this.create({
       recipientId,
       title: "Application Update",
       description: `${
         newStatus === ApplicationStatus.INVITED
-          ? `Youve been invited to a Job Interview!${dueDate ? `Due date: ${dueDate}` : ``}`
+          ? `Youve been invited to a Job Interview!${dueDate ? ` Due date: ${dueDate}` : ``}`
           : ` Your application has been ${newStatus}`
       }`,
       type: NotificationType.APPLICATION_NOTIFICATION,
@@ -26,7 +26,7 @@ export class NotificationService {
   }
 
   static async notifyCreatedContent(
-    content: { Resume: "Resume"; Vacancy: "Vacancy" },
+    content: "Resume" | "Vacancy",
     contentName: string,
     recipientId: string,
   ) {

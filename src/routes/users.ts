@@ -13,6 +13,7 @@ import { fastifyCookie } from "@fastify/cookie";
 import { Database } from "../datasource";
 const bcrypt = require("bcrypt");
 import { ValidateTIN } from "../services/ValidateTIN";
+import { NotificationService } from "../services/NotificationService";
 
 const signupSchema = {
   body: {
@@ -157,6 +158,7 @@ module.exports = async (fastify: FastifyInstance) => {
       try {
         await userPool.save(user);
         const { password, ...userResponse } = user;
+        await NotificationService.notifyValidationStatus(user.id, user.verified);
         return res.status(201).send({
           success: true,
           message: "User registered successfully",
@@ -285,6 +287,7 @@ module.exports = async (fastify: FastifyInstance) => {
         case Role.EMPLOYER:
           const validateTIN = new ValidateTIN();
           updateData.verified = await validateTIN.isExists(updateData.tin);
+          await NotificationService.notifyValidationStatus(user.id, updateData.verified);
           delete updateData.educations;
           delete updateData.status;
           delete updateData.description;

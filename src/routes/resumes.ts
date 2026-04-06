@@ -5,6 +5,7 @@ import { Role, User } from "../entities/User";
 import { Database } from "../datasource";
 import { Resume, ResumeStatus, ResumeWorkFormat } from "../entities/Resume";
 import { Brackets } from "typeorm";
+import { NotificationService } from "../services/NotificationService";
 
 const createSchema = {
   body: {
@@ -155,6 +156,7 @@ module.exports = async (fastify: FastifyInstance) => {
       });
       try {
         await resumePool.save(resume);
+        await NotificationService.notifyCreatedContent("Resume", resume.profession, req.user.id);
         return res.status(201).send({ success: true, message: "Resume created", data: resume });
       } catch (e) {
         return res.status(500).send({ success: false, message: "Internal server error" });

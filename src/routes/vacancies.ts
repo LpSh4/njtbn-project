@@ -5,6 +5,7 @@ import { Role, User } from "../entities/User";
 import { Database } from "../datasource";
 import { Vacancy, VacancyStatus, WorkFormat, WorkingHours, WorkSchedule } from "../entities/Vacancy";
 import { Brackets, Not } from "typeorm";
+import { NotificationService } from "../services/NotificationService";
 
 const createSchema = {
   body: {
@@ -160,6 +161,7 @@ module.exports = async (fastify: FastifyInstance) => {
 
       try {
         await vacancyPool.save(vacancy);
+        await NotificationService.notifyCreatedContent("Vacancy", vacancy.profession, req.user.id);
         return res.status(201).send({ success: true, message: "OK", data: vacancy });
       } catch (e) {
         return res.status(500).send({ success: false, message: "Internal server error" });

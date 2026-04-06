@@ -157,7 +157,7 @@ module.exports = (fastify: FastifyInstance) => {
     },
   );
 
-  fastify.patch<{ Body: { status: ApplicationStatus }; Params: { id: string } }>(
+  fastify.patch<{ Body: { status: ApplicationStatus; dueDate?: string }; Params: { id: string } }>(
     "/:id",
     {
       preHandler: fastify.authenticate,
@@ -189,6 +189,11 @@ module.exports = (fastify: FastifyInstance) => {
 
       try {
         await applicationPool.save(application);
+        await NotificationService.notifyApplicationStatusChange(
+          application.applicantId,
+          application.status,
+          req.body.dueDate ? req.body.dueDate : undefined,
+        );
         return res.status(200).send({ success: true, message: "OK", data: application });
       } catch (e) {
         return res.status(500).send({ success: false, message: "Internal Server Error" });
