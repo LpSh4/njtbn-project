@@ -5,12 +5,19 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    useEffect(() => {
+        console.log("USER CHANGED:", user);
+    }, [user]);
+
     const [loading, setLoading] = useState(true);
 
     const login = (userData) => {
-        setUser(userData);
+        if (typeof userData === "function") {
+            setUser(prev => userData(prev));
+        } else {
+            setUser(userData);
+        }
     };
-
     const logout = () => {
         setUser(null);
     };
@@ -22,10 +29,17 @@ export const AuthProvider = ({ children }) => {
         const checkSession = async () => {
             try {
                 const res = await checkAuth();
-                setUser(res.data.data); // бек возвращает юзера
-                console.log("AUTOLOGIN OK:", res.data.data);
-            } catch {
+
+
+                if (res?.data?.data) {
+                    setUser(res.data.data);
+                    console.log("AUTOLOGIN OK:", res.data.data);
+                }
+
+            } catch (e) {
                 console.log("Нет активной сессии");
+
+
             } finally {
                 setLoading(false);
             }
