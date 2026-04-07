@@ -3,8 +3,8 @@ import close from "./icons/close.svg";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext.jsx";
-import { loginUser, getUser, getMe } from "../../api/authApi";
+import { AuthContext } from "../../context/AuthContext";
+import { loginUser } from "../../api/authApi";
 
 export const ModalLogin = ({ isOpen, setIsOpen }) => {
     const navigate = useNavigate();
@@ -18,23 +18,20 @@ export const ModalLogin = ({ isOpen, setIsOpen }) => {
 
     const onSubmit = async (data) => {
         try {
-            await loginUser({
+            const res = await loginUser({
                 email: data.email,
                 password: data.password
             });
 
-            const meRes = await getMe();
-            const { id, role } = meRes.data.data;
-
-            const userRes = await getUser(id);
-
-            login({
-                ...userRes.data.data,
-                role
-            });
+            login(res.data.data);
 
             setIsOpen(false);
-            navigate("/profile");
+
+            const role = res.data.data.role;
+
+            if (role === "employer") navigate("/profileEmployer");
+            else if (role === "specialist") navigate("/profileSpecialist");
+            else navigate("/");
 
         } catch (e) {
             console.error("LOGIN ERROR:", e.response?.data || e);

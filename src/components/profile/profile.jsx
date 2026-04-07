@@ -1,26 +1,53 @@
 import "./profile.scss"
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import {ProfileUser} from "../ProfileHeader/profileUser.jsx";
-export const Profile = () => {
-    const { role } = useContext(AuthContext);
+import {ProfileDescriptions} from "../ProfileDescritions/profileDescriptions.jsx";
+import {ProfileProfession} from "../ProfileProfession/ProfileProfession.jsx";
+import {ProfileBasicInfo} from "../ProfileBasicInfo/ProfileBasicInfo.jsx";
 
-    const userData =
-        role === "employer"
-            ? {
-                name: "Компания ООО",
-                job: "Работодатель",
-                date: "2020-01-01",
-            }
-            : {
-                name: "John",
-                job: "Frontend developer",
-                date: "2000-05-10",
-            };
+export const ProfileRedirect = () => {
+    const { role, loading, isAuth } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (loading) return;
+
+        if (!isAuth) {
+            navigate("/");
+            return;
+        }
+
+        if (role === "employer") {
+            navigate("/profileEmployer");
+        } else if (role === "specialist") {
+            navigate("/profileSpecialist");
+        } else {
+            navigate("/");
+        }
+
+    }, [role, loading, isAuth]);
 
     return (
+        <>
         <section className="profile">
-            <ProfileUser data={userData} />
+            <div className="profile__content">
+                <ProfileUser></ProfileUser>
+                <ProfileDescriptions></ProfileDescriptions>
+                <ProfileProfession></ProfileProfession>
+
+
+            </div>
+
+            <div className="profile__content">
+                <ProfileBasicInfo>
+
+                </ProfileBasicInfo>
+            </div>
         </section>
-    );
+        </>
+    )
 };
+
+export default ProfileRedirect;

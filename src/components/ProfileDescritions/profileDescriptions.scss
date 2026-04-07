@@ -1,0 +1,35 @@
+@use "../../styles/mixins";
+
+.description {
+  @include mixins.flex(column,start,start);
+  gap: 12px;
+  &__title {
+    @include mixins.flex();
+    column-gap: 11px;
+    h2{
+      font-size: 30px;
+    }
+  }
+
+  &__text-cont{
+    padding: 27px 10px 89px 29px;
+    width: 1035px;
+    box-shadow: 0 0 5px 0;
+    border-radius: 30px;
+    @media (max-width: 1050px) {
+      width: 835px;
+    }
+    @media (max-width:850px) {
+      width: 635px;
+    }
+
+    @media (max-width:650px) {
+      width: 435px;
+    }
+
+    @media (max-width:450px) {
+      width: 325px;
+    }
+
+  }
+}

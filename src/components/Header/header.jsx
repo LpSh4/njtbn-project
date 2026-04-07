@@ -5,16 +5,26 @@ import logo from "./icons/logo.png";
 import menu from "./icons/Menu.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
+
 export default function Header({ setIsLoginOpen }) {
+
+
+
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
 
     const { isAuth, logout } = useContext(AuthContext);
     const location = useLocation();
+    const isProfilePage =
+        location.pathname === "/profile" ||
+        location.pathname === "/profileEmployer" ||
+        location.pathname === "/profileSpecialist";
     const handleLogout = () => {
         logout();
         navigate("/");
     };
+
+
     return (
         <header className="header">
             <div className="header__element-cont">
@@ -38,7 +48,7 @@ export default function Header({ setIsLoginOpen }) {
                     </button>
                 ) : (
                     <>
-                        {location.pathname !== "/profile" && (
+                        {!isProfilePage && (
                                 <button onClick={() => navigate("/profile")}>
                                     Профиль
                                 </button>

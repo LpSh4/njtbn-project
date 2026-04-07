@@ -1,7 +1,7 @@
-import Profile from '../../components/profile/profile.jsx'
+import ProfileRedirect from '../../components/profile/profile.jsx'
 
 export const ProfileEmployer = () => (
     <>
-        <Profile></Profile>
+        <ProfileRedirect ></ProfileRedirect>
     </>
 )

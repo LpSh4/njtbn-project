@@ -2,11 +2,25 @@
 
 .user{
   padding: 19px 16px 19px 23px;
-  max-width: 1035px;
-  width: 100%;
+width: 1035px;
   @include mixins.flex(row, space-between,start);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   border-radius: 30px;
+  @media (max-width: 1050px) {
+    width: 835px;
+  }
+  @media (max-width:850px) {
+    width: 635px;
+  }
+
+  @media (max-width:650px) {
+    width: 435px;
+  }
+
+  @media (max-width:450px) {
+    width: 325px;
+  }
+
   @media (max-width: 620px) {
     @include mixins.flex( column-reverse);
     gap: 20px;
@@ -42,6 +56,16 @@
   &__input-field{
     @include mixins.flex(column, start,start);
     gap: 11px;
+
+    p{
+      font-size: 18px;
+    }
+
+    input{
+      padding: 10px;
+      border: solid rgba(0,0,0,0.5);
+      border-radius: 21px;
+    }
   }
 
   &__profile{

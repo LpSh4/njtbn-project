@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { getMe, getUser } from "../api/authApi";
+import { checkAuth } from "../api/authApi";
 
 export const AuthContext = createContext();
 
@@ -19,26 +19,19 @@ export const AuthProvider = ({ children }) => {
     const role = user?.role;
 
     useEffect(() => {
-        const checkAuth = async () => {
+        const checkSession = async () => {
             try {
-                const meRes = await getMe();
-                const { id, role } = meRes.data.data;
-
-                const userRes = await getUser(id);
-
-                login({
-                    ...userRes.data.data,
-                    role
-                });
-
+                const res = await checkAuth();
+                setUser(res.data.data); // бек возвращает юзера
+                console.log("AUTOLOGIN OK:", res.data.data);
             } catch {
-                console.log("Не авторизован");
+                console.log("Нет активной сессии");
             } finally {
                 setLoading(false);
             }
         };
 
-        checkAuth();
+        checkSession();
     }, []);
 
     return (

@@ -1,6 +1,14 @@
 @use "../../styles/mixins";
 
 .profile {
+  padding: 0 0 0 30px;
   margin-top: 46px;
-  @include mixins.flex()
+  @include mixins.flex(row,center,start,wrap-reverse);
+  gap: 36px;
+
+  &__content{
+    @include mixins.flex(column,start,start);
+    gap: 40px;
+  }
+
 }

@@ -1,0 +1,74 @@
+@use "../../styles/mixins";
+
+.card{
+  padding: 0 0 21px 0;
+  width: 100%;
+  @include mixins.flex(row,center,center);
+  column-gap: 120px;
+  row-gap: 20px;
+  border-bottom:solid 0.5px rgba(0,0,0,0.5);
+  @media (max-width: 1050px) {
+    @include mixins.flex(row,center,center,wrap);
+
+  }
+
+
+&__text-cont{
+  width: 100%;
+  @include mixins.flex(row);
+column-gap: 120px;
+  row-gap: 20px;
+
+  @media (max-width: 1050px) {
+    @include mixins.flex(row,space-between,center,wrap);
+  }
+
+
+
+  @media (max-width: 850px) {
+    @include mixins.flex(row,space-between,center,wrap);
+  }
+
+
+  @media (max-width: 650px) {
+    @include mixins.flex(start,center,wrap);
+  }
+  }
+
+
+  &__text{
+    @include mixins.flex(column, start,start);
+    gap: 20px;
+    @media (max-width: 1050px) {
+      @include mixins.flex(column, start,start);
+
+    }
+
+    @media (max-width: 650px) {
+      width: 150px;
+
+    }
+
+    h2{
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    button{
+      margin-top: 31px;
+      padding: 9px 0;
+      width: 135px;
+      background-color: #3914AF;
+      color: #fff;
+      border-radius: 18px;
+    }
+  }
+
+  &__description{
+    @include mixins.flex();
+  }
+
+  &__btn-cont{
+    @include mixins.flex(row,end);
+  }
+}

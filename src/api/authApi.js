@@ -8,10 +8,10 @@ export const loginUser = (data) => {
     return api.post(`/users/login`, data);
 };
 
-export const getMe = () => {
-    return api.get(`/users/me`);
+export const checkAuth = () => {
+    return api.get(`/users/login`);
 };
 
-export const getUser = (me) => {
-    return api.get(`/users/${me}`);
+export const updateUser = (data) => {
+    return api.patch(`/users/update`, data);
 };
