@@ -204,7 +204,11 @@ module.exports = async (fastify: FastifyInstance) => {
         path: "/",
       })
       .status(200)
-      .send({ success: true, message: `Login successfull` });
+      .send({
+        success: true,
+        message: `Login successfull`,
+        data: { role: user.role, id: user.id, name: user.name },
+      });
   });
 
   fastify.post("/logout", { preHandler: fastify.authenticate }, async (req, res) => {
@@ -221,13 +225,6 @@ module.exports = async (fastify: FastifyInstance) => {
       })
       .status(200)
       .send({ success: true, message: "Logged out" });
-  });
-
-  fastify.get("/me", { preHandler: fastify.authenticate }, async (req, res) => {
-    if (!req.user.role) throw new UnauthorizedError("User not found");
-    return res
-      .status(200)
-      .send({ success: true, message: "OK", data: { id: req.user.id, role: req.user.role } });
   });
 
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
