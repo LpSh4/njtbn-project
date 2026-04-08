@@ -206,7 +206,7 @@ module.exports = async (instance: FastifyInstance) => {
       .clearCookie("access_token", {
         httpOnly: true,
         secure: false,
-        sameSite: "none",
+        sameSite: "lax",
         signed: true,
         path: "/",
       })
