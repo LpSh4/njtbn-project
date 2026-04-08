@@ -158,8 +158,8 @@ module.exports = async (instance: FastifyInstance) => {
     return res
       .setCookie("access_token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: true,
+        sameSite: "none",
         signed: true,
         path: "/",
       })
@@ -185,8 +185,8 @@ module.exports = async (instance: FastifyInstance) => {
     return res
       .setCookie("access_token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: true,
+        sameSite: "none",
         signed: true,
         path: "/",
       })
@@ -205,7 +205,7 @@ module.exports = async (instance: FastifyInstance) => {
     res
       .clearCookie("access_token", {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "none",
         signed: true,
         path: "/",
