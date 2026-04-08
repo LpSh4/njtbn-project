@@ -6,10 +6,6 @@ import { Application, ApplicationStatus } from "../entities/Application";
 import { NotificationService } from "../services/NotificationService";
 import { ConflictError, ForbiddenError, NotFoundError } from "../services/ErrorService";
 
-interface viewQuery {
-  status: ApplicationStatus;
-}
-
 // const calculateAge = (birthDate?: Date | string): number | null => {
 //   if (!birthDate) return null;
 //   const birthYear = new Date(birthDate).getFullYear();
@@ -72,7 +68,7 @@ module.exports = (fastify: FastifyInstance) => {
         throw new NotFoundError("Vacancy not found");
       }
       if (req.user.id !== vacancy.managerId) {
-        throw new ForbiddenError("Forbidden");
+        throw new ForbiddenError();
       }
       const applicationRepo = Database.getRepository(Application);
       const applications = await applicationRepo.find({
@@ -105,58 +101,58 @@ module.exports = (fastify: FastifyInstance) => {
     },
   );
 
-  fastify.get<{ Querystring: viewQuery }>(
-    "/",
-    { preHandler: fastify.authenticate },
-    async (req, res) => {
-      const applicationPool = Database.getRepository(Application);
-      let data: any, applications: any;
-      switch (req.user.role) {
-        case Role.EMPLOYER:
-          applications = await applicationPool.find({
-            where: {
-              employerId: req.user.id,
-              status: req.query.status ? req.query.status : undefined,
-            },
-            relations: ["vacancy"],
-          });
-          data = applications.map((app: Application) => {
-            const vacancy = app.vacancy;
-
-            return {
-              ...app,
-              profession: vacancy.profession,
-              workFormat: vacancy.workFormat,
-              vacancy: undefined,
-            };
-          });
-          return res.status(200).send({ success: true, message: "OK", data: data });
-        case Role.SPECIALIST:
-          applications = await applicationPool.find({
-            where: { applicantId: req.user.id },
-            relations: ["vacancy", "employer"],
+  fastify.get<{
+    Querystring: {
+      status: ApplicationStatus;
+    };
+  }>("/", { preHandler: fastify.authenticate }, async (req, res) => {
+    const applicationPool = Database.getRepository(Application);
+    let data: any, applications: any;
+    switch (req.user.role) {
+      case Role.EMPLOYER:
+        applications = await applicationPool.find({
+          where: {
+            employerId: req.user.id,
             status: req.query.status ? req.query.status : undefined,
-          });
-          data = applications.map((app: Application) => {
-            const vacancy = app.vacancy;
-            const employer = app.employer;
-            return {
-              ...app,
-              profession: vacancy.profession,
-              workFormat: vacancy.workFormat,
-              salaryFrom: vacancy.salaryFrom,
-              salaryTo: vacancy.salaryTo,
-              manager: employer.name,
-              companyName: employer.companyName,
-              vacancy: undefined,
-              employer: undefined,
-            };
-          });
-          return res.status(200).send({ success: true, message: "OK", data: data });
-      }
-      return res.status(500).send({ success: false, message: "Internal Server Error" });
-    },
-  );
+          },
+          relations: ["vacancy"],
+        });
+        data = applications.map((app: Application) => {
+          const vacancy = app.vacancy;
+
+          return {
+            ...app,
+            profession: vacancy.profession,
+            workFormat: vacancy.workFormat,
+            vacancy: undefined,
+          };
+        });
+        return res.status(200).send({ success: true, message: "OK", data: data });
+      case Role.SPECIALIST:
+        applications = await applicationPool.find({
+          where: { applicantId: req.user.id },
+          relations: ["vacancy", "employer"],
+          status: req.query.status ? req.query.status : undefined,
+        });
+        data = applications.map((app: Application) => {
+          const vacancy = app.vacancy;
+          const employer = app.employer;
+          return {
+            ...app,
+            profession: vacancy.profession,
+            workFormat: vacancy.workFormat,
+            salaryFrom: vacancy.salaryFrom,
+            salaryTo: vacancy.salaryTo,
+            manager: employer.name,
+            companyName: employer.companyName,
+            vacancy: undefined,
+            employer: undefined,
+          };
+        });
+        return res.status(200).send({ success: true, message: "OK", data: data });
+    }
+    return res.status(500).send({ success: false, message: "Internal Server Error" });
+  });
 
   fastify.patch<{ Body: { status: ApplicationStatus; dueDate?: string }; Params: { id: string } }>(
     "/:id",
@@ -206,9 +202,6 @@ module.exports = (fastify: FastifyInstance) => {
     "/:id",
     { preHandler: fastify.authenticate },
     async (req, res) => {
-      if (req.user.role === Role.EMPLOYER) {
-        throw new ForbiddenError("Forbidden");
-      }
       const applicationPool = Database.getRepository(Application);
       const application = await applicationPool.findOne({
         where: { id: req.params.id },
