@@ -7,7 +7,7 @@ import { ValidateTIN } from "../services/ValidateTIN";
 import { NotificationService } from "../services/NotificationService";
 import { PoolService } from "../services/PoolService";
 import { ConflictError, NotFoundError, RequestError, UnauthorizedError } from "../services/ErrorService";
-import { Type } from "@fastify/type-provider-typebox";
+import { Type, TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
 const bcrypt = require("bcrypt");
 const validateTIN = new ValidateTIN();
@@ -35,90 +35,71 @@ const signupSchema = {
   },
 };
 
-const loginSchema = {
-  body: {
-    type: "object",
-    required: ["email", "password"],
-    properties: {
-      email: { type: "string", format: "email" },
-      password: { type: "string", format: "password" },
-    },
-  },
-};
-
 const updateSchema = {
-  body: {
-    type: "object",
-    properties: {
-      phone: { type: "string", pattern: "^89\\d{9}$" },
-      gender: {
-        type: "string",
-        enum: Object.values(Gender),
-      },
-      city: { type: "string", minLength: 2, maxLength: 100 },
-      socialLinks: {
-        type: "array",
-        items: { type: "string", format: "uri" },
-      },
-      description: { type: "string", maxLength: 500 },
+  tags: ["Users"],
+  summary: "Update user profile",
+  body: Type.Partial(
+    Type.Object({
+      phone: Type.String({ pattern: "^89\\d{9}$" }),
+      gender: Type.Enum(Gender),
+      city: Type.String({ minLength: 2, maxLength: 100 }),
+      socialLinks: Type.Array(Type.String({ format: "uri" })),
+      description: Type.String({ maxLength: 500 }),
       // Employer specific
-      managerPosition: { type: "string", maxLength: 150 },
-      companyName: { type: "string", maxLength: 255 },
-      companyWebsite: {
-        type: "string",
+      managerPosition: Type.String({ maxLength: 150 }),
+      companyName: Type.String({ maxLength: 255 }),
+      companyWebsite: Type.String({
         pattern:
           "^https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)$",
-      },
-      tin: { type: "string", minLength: 10, maxLength: 12 },
+      }),
+      tin: Type.String({ minLength: 10, maxLength: 12 }),
       // Specialist specific
-      educations: {
-        type: "array",
-        items: {
-          type: "string",
-          enum: Object.values(EducationLevel),
-        },
-      },
-      status: {
-        type: "string",
-        enum: Object.values(ProfileStatus),
-      },
-      birthDate: { type: "string", format: "date" }, // Validates "YYYY-MM-DD"
-      citizenship: { type: "boolean" },
-    },
+      educations: Type.Array(Type.Enum(EducationLevel)),
+      status: Type.Enum(ProfileStatus),
+      birthDate: Type.String({ format: "date" }),
+      citizenship: Type.Boolean(),
+    }),
+  ),
+  response: {
+    204: Type.Object({
+      success: Type.Boolean(),
+      message: Type.String(),
+    }),
+    401: Type.Object({
+      success: Type.Boolean(),
+      message: Type.String(),
+    }),
+    403: Type.Object({
+      success: Type.Boolean(),
+      message: Type.String(),
+    }),
   },
 };
 
-interface updateBody {
-  phone?: string;
-  gender?: string;
-  city?: string;
-  socialLinks: [];
-  managerPosition?: string;
-  companyName?: string;
-  companyWebsite?: string;
-  educations?: [];
-  status?: string;
-  tin?: string;
-  description?: string;
-  birthDate?: Date;
-  citizenship?: boolean;
-}
-
-interface signupBody {
-  name: string;
-  surname: string;
-  email: string;
-  phone: string;
-  password: string;
-  tin?: number;
-}
+const loginSchema = {
+  tags: ["Users"],
+  summary: "Login to an account",
+  body: Type.Object({
+    email: Type.String({ format: "email" }),
+    password: Type.String({ minLength: 8 }),
+  }),
+  response: {
+    201: Type.Object({
+      success: Type.Boolean(),
+      message: Type.String(),
+      data: Type.Any(),
+    }),
+  },
+};
 
 interface userParams {
   id: string;
   role: Role;
 }
 
-module.exports = async (fastify: FastifyInstance) => {
+module.exports = async (instance: FastifyInstance) => {
+  const fastify = instance.withTypeProvider<TypeBoxTypeProvider>();
+
   const sanitizeUpdateData = (role: Role, data: any) => {
     const commonFields = ["phone", "gender", "city", "socialLinks", "description"];
     const employerFields = ["managerPosition", "companyName", "companyWebsite", "tin"];
@@ -136,53 +117,49 @@ module.exports = async (fastify: FastifyInstance) => {
     return sanitized;
   };
 
-  fastify.post<{ Params: userParams; Body: signupBody }>(
-    "/signup/:role",
-    { schema: signupSchema },
-    async (req, res) => {
-      const { email, phone, password: rawPassword, ...data } = req.body;
-      const userPool = PoolService.getUserPool(req.params.role);
-      if (
-        await Database.getRepository("User").findOne({
-          where: [{ email }, { phone }],
-        })
-      ) {
-        throw new ConflictError("Email or phone already in use");
-      }
+  fastify.post("/signup/:role", { schema: signupSchema }, async (req, res) => {
+    const { email, phone, password: rawPassword, ...data } = req.body;
+    const userPool = PoolService.getUserPool(req.params.role);
+    if (
+      await Database.getRepository("User").findOne({
+        where: [{ email }, { phone }],
+      })
+    ) {
+      throw new ConflictError("Email or phone already in use");
+    }
 
-      const hashedPassword = await bcrypt.hash(rawPassword, 12);
-      let user;
-      Object.assign(data, { email, phone, password: hashedPassword });
-      switch (req.params.role) {
-        case Role.EMPLOYER:
-          if (!req.body.tin) {
-            throw new RequestError("TIN missing/invalid");
-          }
-          const valid = await validateTIN.isExists(req.body.tin.toString());
-          user = userPool.create({
-            ...data,
-            verified: valid,
-          });
-          break;
-        case Role.SPECIALIST:
-          user = userPool.create({
-            ...data,
-          });
-          break;
-        default:
-          throw new RequestError();
-      }
+    const hashedPassword = await bcrypt.hash(rawPassword, 12);
+    let user;
+    Object.assign(data, { email, phone, password: hashedPassword });
+    switch (req.params.role) {
+      case Role.EMPLOYER:
+        if (!req.body.tin) {
+          throw new RequestError("TIN missing/invalid");
+        }
+        const valid = await validateTIN.isExists(req.body.tin.toString());
+        user = userPool.create({
+          ...data,
+          verified: valid,
+        });
+        break;
+      case Role.SPECIALIST:
+        user = userPool.create({
+          ...data,
+        });
+        break;
+      default:
+        throw new RequestError();
+    }
 
-      await userPool.save(user);
-      const { password, ...userResponse } = user;
-      await NotificationService.notifyValidationStatus(user.id, user.verified);
-      return res.status(201).send({
-        success: true,
-        message: "User registered successfully",
-        data: userResponse,
-      });
-    },
-  );
+    await userPool.save(user);
+    const { password, ...userResponse } = user;
+    await NotificationService.notifyValidationStatus(user.id, user.verified);
+    return res.status(201).send({
+      success: true,
+      message: "User registered successfully",
+      data: userResponse,
+    });
+  });
 
   fastify.post("/login", { schema: loginSchema }, async (req, res) => {
     const data = req.body as any;
@@ -277,7 +254,7 @@ module.exports = async (fastify: FastifyInstance) => {
     });
   });
 
-  fastify.patch<{ Body: updateBody }>(
+  fastify.patch(
     "/update",
     { preHandler: fastify.authenticate, schema: updateSchema },
     async (req, res) => {
