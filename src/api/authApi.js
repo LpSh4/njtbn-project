@@ -9,7 +9,13 @@ export const loginUser = (data) => {
 };
 
 export const checkAuth = () => {
-    return api.get(`/users/login`);
+    const id = localStorage.getItem("userId");
+
+    if (!id) {
+        return Promise.reject("No user id");
+    }
+
+    return api.get(`/users/${id}`);
 };
 
 export const updateUser = (data) => {
