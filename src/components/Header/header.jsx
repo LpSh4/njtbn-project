@@ -13,7 +13,9 @@ export default function Header({ setIsLoginOpen }) {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
 
-    const { isAuth, logout } = useContext(AuthContext);
+
+    const { isAuth, logout, role } = useContext(AuthContext);
+
     const location = useLocation();
     const isProfilePage =
         location.pathname === "/profile" ||
@@ -34,26 +36,31 @@ export default function Header({ setIsLoginOpen }) {
                 </div>
                 <nav className="header__nav">
                     <ul className="header__list">
-                        <li><a href="">О компании</a></li>
-                        <li><a href="">Партнёрам</a></li>
-                        <li><a href="">Требования к ПО</a></li>
+                        <li><a href="">About the company</a></li>
+                        <li><a href="">Partners</a></li>
+                        <li><a href="">Software requirements</a></li>
                     </ul>
                 </nav>
             </div>
 
             <div className="header__url">
                 {!isAuth ? (
-                    <button onClick={() => setIsLoginOpen(true)}>
-                        Войти
-                    </button>
+                    <button onClick={() => setIsLoginOpen(true)}>SignIn</button>
                 ) : (
                     <>
-                        {!isProfilePage && (
-                                <button onClick={() => navigate("/profile")}>
-                                    Профиль
-                                </button>
+                        {role === "specialist" && (
+                            <button onClick={() => navigate("/vacancies")}>Vacancy</button>
                         )}
-                        <button onClick={handleLogout}>Выйти</button>                    </>
+                        {role === "employer" && (
+                            <button onClick={() => navigate("/resumes")}>Resume</button>
+                        )}
+
+                        {!isProfilePage && (
+                            <button onClick={() => navigate("/profile")}>Profile</button>
+                        )}
+
+                        <button onClick={handleLogout}>Logout</button>
+                    </>
                 )}
             </div>
 
@@ -67,34 +74,38 @@ export default function Header({ setIsLoginOpen }) {
 
                 <div className={`mobile-menu ${isOpen ? "active" : ""}`}>
                     <ul className="mobile-menu__list">
-
                         {!isAuth ? (
                             <li className="mobile-menu__item">
-                                <button onClick={() => setIsLoginOpen(true)}>
-                                    Войти
-                                </button>
+                                <button onClick={() => setIsLoginOpen(true)}>SignIn</button>
                             </li>
                         ) : (
                             <>
-                                <li className="mobile-menu__item">
-                                    {location.pathname !== "/profile" && (
-                                        <button onClick={() => navigate("/profile")}>
-                                            Профиль
-                                        </button>
-                                    )}
-                                </li>
+                                {role === "specialist" && (
+                                    <li className="mobile-menu__item">
+                                        <button onClick={() => navigate("/vacancies")}>Vacancy</button>
+                                    </li>
+                                )}
+                                {role === "employer" && (
+                                    <li className="mobile-menu__item">
+                                        <button onClick={() => navigate("/resumes")}>Resume</button>
+                                    </li>
+                                )}
+
+                                {!isProfilePage && (
+                                    <li className="mobile-menu__item">
+                                        <button onClick={() => navigate("/profile")}>Profile</button>
+                                    </li>
+                                )}
 
                                 <li className="mobile-menu__item">
-                                    <button onClick={logout}>
-                                        Выйти
-                                    </button>
+                                    <button onClick={logout}>Logout</button>
                                 </li>
                             </>
                         )}
 
-                        <li className="mobile-menu__item"><a href="">О компании</a></li>
-                        <li className="mobile-menu__item"><a href="">Партнёрам</a></li>
-                        <li className="mobile-menu__item"><a href="">Требования к ПО</a></li>
+                        <li className="mobile-menu__item"><a href="">About the company</a></li>
+                        <li className="mobile-menu__item"><a href="">Partners</a></li>
+                        <li className="mobile-menu__item"><a href="">Software requirements</a></li>
                     </ul>
                 </div>
             </div>

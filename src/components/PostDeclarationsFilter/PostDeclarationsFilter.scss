@@ -1,0 +1,75 @@
+@use "../../styles/mixins";
+
+.search-filter{
+  @include mixins.flex(column,start, center);
+  gap: 24px;
+  &__text-cont{
+    @include mixins.flex(column, start, start);
+@media (max-width: 950px) {
+  width: 100%;
+}
+    h2{
+      width: 100%;
+      text-align: center;
+      font-size: 30px;
+    }
+  }
+
+
+
+  &__input-cont{
+    @include mixins.flex(column, start, start);
+    gap: 10px;
+    @media (max-width: 950px) {
+      width: 100%;
+      @include mixins.flex(column);
+    }
+    p{
+      width: 100%;
+      @include mixins.flex(column, start, start);
+      gap: 5px;
+
+      label{
+        font-size: 16px;
+      }
+
+      select{
+        width: 100%;
+        padding: 8px;
+       border: solid 1px  #1e1e1e;
+        border-radius: 20px;
+      }
+
+      input{
+        padding: 8px;
+        border: solid 1px  #1e1e1e;
+        border-radius: 20px;
+      }
+    }
+  }
+
+  button{
+    border-radius: 18px;
+    padding: 8px 0;
+    width:224px;
+    background-color: #3914AF;
+    color: white;
+  }
+
+  &__input-field{
+    @include mixins.flex(column, start, start);
+    @media(max-width: 950px) {
+      width: 100%;
+    }
+    p{
+      @include mixins.flex();
+      column-gap:19px;
+      row-gap:5px;
+      input{
+        width: 100%;
+      }
+    }
+  }
+
+
+}

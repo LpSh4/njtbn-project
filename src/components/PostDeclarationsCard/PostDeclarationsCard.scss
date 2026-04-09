@@ -1,0 +1,80 @@
+@use "../../styles/mixins";
+
+.declaration-card{
+  width: 1139px;
+  padding: 31px 47px 44px 29px;
+  @include mixins.flex(row,start,center);
+  gap: 40px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 58px;
+  @media (max-width: 1550px) {
+    width: 939px;
+  }
+
+  @media (max-width: 1350px) {
+    width:739px;
+  }
+
+  @media (max-width: 1150px) {
+    @include mixins.flex(column,start,center);
+    width:539px;
+  }
+
+
+  @media (max-width: 600px) {
+    @include mixins.flex(column,start,center);
+    width:439px;
+  }
+
+
+  @media (max-width: 470px) {
+    @include mixins.flex(column,start,center);
+    width:339px;
+  }
+
+
+
+  &__header{
+    @include mixins.flex(column);
+    gap: 2px;
+  }
+
+&__body{
+  @include mixins.flex(column,start,start);
+  gap: 44px;
+
+  @media (max-width: 1150px) {
+    @include mixins.flex(column);
+  }
+
+  button{
+    padding: 15px 0;
+    width: 167px;
+    border-radius: 13px;
+    background-color: #3914AF;
+    color: white;
+  }
+}
+
+
+  &__text{
+    @include mixins.flex(column,start,start);
+    gap: 44px;
+    @media (max-width: 1150px) {
+      @include mixins.flex(column);
+    }
+    h2{
+      font-size: 27px;
+      font-weight: bold;
+    }
+  }
+
+  &__description{
+    @include mixins.flex(column,start,start);
+    gap:19px;
+    @media (max-width: 1150px) {
+      @include mixins.flex(column);
+    }
+  }
+
+}

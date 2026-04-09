@@ -23,3 +23,11 @@ export const checkAuth = () => {
 export const updateUser = (data) => {
     return api.patch(`/users/update`, data);
 };
+
+export const searchResumes = (params) => {
+    return api.post("/resumes/search", params);
+};
+
+export const searchVacancies = (params) => {
+    return api.post("/vacancies/search", params);
+};

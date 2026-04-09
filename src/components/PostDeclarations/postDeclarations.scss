@@ -1,0 +1,67 @@
+@use "../../styles/mixins";
+
+
+.declaration {
+  margin-top: 52px;
+  padding-left: 51px;
+  @include mixins.flex(row, start, start);
+  gap: 87px;
+
+  @media (max-width: 950px) {
+    padding-left: 21px;
+    @include mixins.flex(column);
+
+  }
+
+  &__filter{
+    @media (max-width: 950px) {
+      width: 100%;
+
+    }
+  }
+
+  &__content{
+    width: 100%;
+    @include mixins.flex(column);
+    gap: 32px;
+  }
+
+  &__search{
+    padding: 10px;
+    width: 100%;
+    input{
+      width: 100%;
+      padding: 11px 10px 11px 22px;
+      border: solid 1px #1e1e1e;
+      border-radius: 22px;
+    }
+  }
+
+  &__post{
+    width: 100%;
+    @include mixins.flex(column, start, start);
+    gap: 52px;
+
+    @media (max-width: 950px) {
+      @include mixins.flex(column);
+    }
+  }
+}
+
+.pagination{
+ @include mixins.flex();
+  gap: 20px;
+
+  button  {
+    padding: 11px 0;
+    width: 60px;
+    background-color: #3914AF;
+    border-radius:15px;
+    color: #fff;
+    transition: 1s;
+  }
+
+  button:hover  {
+    transform: scale(1.1);
+  }
+}

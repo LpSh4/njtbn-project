@@ -14,6 +14,8 @@ import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import {CreateResume} from "./pages/CreateResume/CreateResume.jsx";
 import {CreateVacancy} from "./pages/CreateVacancy/CreateVacancy.jsx";
+import {ResumeDeclarations } from "./pages/ResumeDeclarations/ResumeDeclarations.jsx"
+import {VacancyDeclarations} from "./pages/VacancyDeclarations/VacancyDeclarations.jsx"
 
 const App = () => {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -35,6 +37,8 @@ const App = () => {
                  <Route path="/profileSpecialist" element={<ProfileSpecialist />} />
                  <Route path="/createResume" element={<CreateResume />} />
                  <Route path="/createVacancy" element={<CreateVacancy />} />
+                 <Route path="/resumes" element={<ResumeDeclarations />} />
+                 <Route path="/vacancies" element={<VacancyDeclarations />} />
                 </Routes>
             </main>
 

@@ -4,7 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { api } from "../../api/axios";
 import "./CreatePost.scss";
 
-export const CreatePost = ({ type }) => {
+export const CreatePost = ({ type, onPostCreated }) => {
     const { role } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -114,7 +114,12 @@ export const CreatePost = ({ type }) => {
             }
 
             alert(`${type === "resume" ? "Resume" : "Vacancy"} created successfully!`);
-            navigate("/profile");
+
+            if (onPostCreated && newPost?.data) {
+                onPostCreated(newPost.data);
+            }
+
+            navigate("/profile")
         } catch (err) {
             console.error("BACKEND ERROR:", err.response?.data);
             alert("Error creating post");
@@ -128,6 +133,7 @@ export const CreatePost = ({ type }) => {
             <form className="post__form" onSubmit={handleSubmit}>
                 <div className="post__content">
                     <div className="post__input-field">
+
                         <p>
                             <label>{labelText("Vacancy profession", "Profession")}</label>
                             <input type="text" name="profession" value={formData.profession} onChange={handleChange} />
@@ -199,6 +205,7 @@ export const CreatePost = ({ type }) => {
                                 <span className="error">{errors.salaryFrom || errors.salaryTo}</span>
                             )}
                         </div>
+
 
                         <div className="description-cont">
                             <h2>Description</h2>
