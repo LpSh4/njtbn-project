@@ -42,13 +42,35 @@ export const ProfileUser = () => {
     };
 
     const handleSave = async (e) => {
-        e.preventDefault();
 
-        const res = await updateProfile({
-            name: formData.name,
-            surname: formData.surname,
-            birthDate: formData.birthDate,
-        });
+
+        const payload = {};
+
+        if (formData.name !== user.name) {
+            payload.name = formData.name;
+        }
+
+        if (formData.surname !== user.surname) {
+            payload.surname = formData.surname;
+        }
+
+        const currentBirth = user.birthDate
+            ? user.birthDate.split("T")[0]
+            : "";
+
+        if (formData.birthDate !== currentBirth) {
+            payload.birthDate = formData.birthDate || "";
+        }
+
+        if (Object.keys(payload).length === 0) {
+            console.log("Nothing changed");
+            setIsEdit(false);
+            return;
+        }
+
+        console.log("SEND:", payload);
+
+        const res = await updateProfile(payload);
 
         if (res.success) {
             setIsEdit(false);
@@ -57,7 +79,6 @@ export const ProfileUser = () => {
             setErrors(res.errors || {});
         }
     };
-
     return (
         <section className="user">
             <div className="user__redact">
@@ -65,7 +86,7 @@ export const ProfileUser = () => {
                     <img src={Check} alt="" />
                 </div>
 
-                <form className="user__form" onSubmit={handleSave}>
+                <form className="user__form">
                     <div className="user__input-field">
                         {isEdit ? (
                             <>
@@ -108,8 +129,9 @@ export const ProfileUser = () => {
                     </div>
 
                     {isEdit ? (
-                        <button type="submit">Save</button>
-                    ) : (
+                        <button type="button" onClick={handleSave}>
+                            Save
+                        </button>                    ) : (
                         <button type="button" onClick={() => setIsEdit(true)}>
                             Edit
                         </button>
