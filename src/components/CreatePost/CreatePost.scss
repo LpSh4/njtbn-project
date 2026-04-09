@@ -1,0 +1,128 @@
+@use "../../styles/mixins";
+
+.post{
+  @include mixins.flex();
+
+  &__form{
+    margin-top: 100px;
+    padding: 41px 62px 59px 49px;
+    @include mixins.flex(column);
+    gap: 35px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+    border-radius:30px;
+
+    @media (max-width: 1000px) {
+      padding: 41px 22px 59px 22px;
+      @include mixins.flex(column);
+    }
+  }
+
+  &__content{
+    @include mixins.flex();
+    row-gap: 20px;
+    column-gap: 100px;
+    @media (max-width: 1300px) {
+      @include mixins.flex(column);
+    }
+
+  }
+
+  &__input-field{
+    @include mixins.flex(column);
+    gap: 20px;
+
+    p{
+      @include mixins.flex(column);
+      gap: 15px;
+      input{
+        padding: 11px 30px;
+        width: 524px;
+        height:50px;
+        border:solid 1px rgba(0, 0, 0, 0.5);
+        border-radius: 25px;
+        @media (max-width: 650px) {
+          width: 324px;
+        }
+        @media (max-width: 450px) {
+          width: 224px;
+        }
+      }
+
+      select{
+        padding: 11px 30px;
+        width: 524px;
+        height:50px;
+        border:solid 1px rgba(0, 0, 0, 0.5);
+        border-radius: 25px;
+        @media (max-width: 650px) {
+          width: 324px;
+        }
+
+        @media (max-width: 450px) {
+          width: 224px;
+        }
+    }
+    }
+
+  &__input-cont{
+    @include mixins.flex(column);
+    gap: 20px;
+
+    div{
+      @include mixins.flex();
+      gap: 15px;
+      column-gap: 68px;
+      input{
+        padding: 11px 30px;
+        width: 224px;
+        height:50px;
+        border:solid 1px rgba(0, 0, 0, 0.5);
+        border-radius: 25px;
+        @media (max-width: 650px) {
+          width: 124px;
+        }
+      }
+
+
+      }
+    }
+
+  }
+
+  button{
+    padding: 11px 0;
+    color: white;
+    background-color: #3914AF;
+    width: 524px;
+    border-radius: 25px;
+
+    @media (max-width: 650px) {
+      width: 324px;
+    }
+
+    @media (max-width: 350px) {
+      width: 224px;
+    }
+  }
+
+  }
+
+
+.description-cont{
+  width: 100%;
+  @include mixins.flex(column);
+  gap: 20px;
+  h2{
+    font-size: 27px;
+  }
+
+  &__text{
+    padding: 20px;
+    width: 100%;
+    max-width: 1244px;
+    height: 200px;
+    border: solid 1px rgba(0, 0, 0, 0.5);
+    border-radius: 25px;
+  }
+
+}
