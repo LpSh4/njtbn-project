@@ -37,8 +37,11 @@ export class SearchService {
 
     const qb = PoolService.getResumePool()
       .createQueryBuilder("resume")
-      .where("resume.status = :st", { st: ResumeStatus.ACTIVE })
-      .andWhere("resume.workFormat = :wf", { wf: query.workFormat });
+      .where("resume.status = :st", { st: ResumeStatus.ACTIVE });
+
+    if (query.workFormat) {
+      qb.andWhere("resume.workFormat = :wf", { wf: query.workFormat });
+    }
 
     if (query.keywords) {
       const words = query.keywords.split(/\s+/).filter(Boolean);
@@ -54,39 +57,55 @@ export class SearchService {
       );
     }
 
-    if (query.city) qb.andWhere("resume.city ILIKE :city", { city: `%${query.city}%` });
-    if (query.salaryFrom) qb.andWhere("resume.desired_salary_from >= :sf", { sf: query.salaryFrom });
-    if (query.salaryTo) qb.andWhere("resume.desired_salary_from <= :st", { st: query.salaryTo });
+    if (query.city) {
+      qb.andWhere("resume.city ILIKE :city", { city: `%${query.city}%` });
+    }
 
-    const orderMap = {
+    if (query.salaryFrom) {
+      qb.andWhere("resume.desired_salary_from >= :sf", { sf: query.salaryFrom });
+    }
+    if (query.salaryTo) {
+      qb.andWhere("resume.desired_salary_from <= :st", { st: query.salaryTo });
+    }
+
+    if (query.expFrom) {
+      qb.andWhere("resume.experience >= :ef", { ef: query.expFrom });
+    }
+    if (query.expTo) {
+      qb.andWhere("resume.experience <= :et", { et: query.expTo });
+    }
+
+    const orderMap: Record<ResumeSearchQuery["sortBy"], { col: string; dir: "ASC" | "DESC" }> = {
       most_popular: { col: "resume.views", dir: "DESC" },
       least_popular: { col: "resume.views", dir: "ASC" },
       most_paid: { col: "resume.desired_salary_from", dir: "DESC" },
       least_paid: { col: "resume.desired_salary_from", dir: "ASC" },
       fresh: { col: "resume.createdAt", dir: "DESC" },
     };
+
     const sort = orderMap[query.sortBy] || orderMap.fresh;
-    qb.orderBy(sort.col as any, sort.dir as any);
+    qb.orderBy(sort.col, sort.dir);
 
     const [results, total] = await qb.take(limit).skip(skip).getManyAndCount();
+
     return {
-      meta: { total, page, lastPage: Math.ceil(total / limit) },
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit) || 0,
+      },
       data: results,
     };
   }
 
   static async VacancySearch(query: VacancySearchQuery) {
     const limit = 7;
-    const page = query.page;
+    const page = query.page || 1;
     const skip = (page - 1) * limit;
 
     const qb = PoolService.getVacancyPool()
       .createQueryBuilder("vacancy")
       .where("vacancy.status = :st", { st: VacancyStatus.OPEN });
-
-    if (query.workFormat) {
-      qb.andWhere("vacancy.workFormat = :wf", { wf: query.workFormat });
-    }
 
     if (query.keywords) {
       const words = query.keywords.split(/\s+/).filter(Boolean);
@@ -102,23 +121,51 @@ export class SearchService {
       );
     }
 
-    if (query.city) qb.andWhere("vacancy.city ILIKE :city", { city: `%${query.city}%` });
-    if (query.salaryFrom) qb.andWhere("vacancy.desired_salary_from >= :sf", { sf: query.salaryFrom });
-    if (query.salaryTo) qb.andWhere("vacancy.desired_salary_from <= :st", { st: query.salaryTo });
+    if (query.city) {
+      qb.andWhere("vacancy.city ILIKE :city", { city: `%${query.city}%` });
+    }
+    if (query.workFormat) {
+      qb.andWhere("vacancy.workFormat = :wf", { wf: query.workFormat });
+    }
+    if (query.workSchedule) {
+      qb.andWhere("vacancy.workSchedule = :ws", { ws: query.workSchedule });
+    }
+    if (query.workingHours) {
+      qb.andWhere("vacancy.workingHours = :wh", { wh: query.workingHours });
+    }
 
-    const orderMap = {
+    if (query.salaryFrom) {
+      qb.andWhere("vacancy.salary_from >= :sf", { sf: query.salaryFrom });
+    }
+    if (query.salaryTo) {
+      qb.andWhere("vacancy.salary_to <= :st", { st: query.salaryTo });
+    }
+    if (query.expFrom) {
+      qb.andWhere("vacancy.experience >= :ef", { ef: query.expFrom });
+    }
+    if (query.expTo) {
+      qb.andWhere("vacancy.experience <= :et", { et: query.expTo });
+    }
+
+    const orderMap: Record<VacancySearchQuery["sortBy"], { col: string; dir: "ASC" | "DESC" }> = {
       most_popular: { col: "vacancy.views", dir: "DESC" },
       least_popular: { col: "vacancy.views", dir: "ASC" },
-      most_paid: { col: "vacancy.desired_salary_from", dir: "DESC" },
-      least_paid: { col: "vacancy.desired_salary_from", dir: "ASC" },
+      most_paid: { col: "vacancy.salary_to", dir: "DESC" },
+      least_paid: { col: "vacancy.salary_from", dir: "ASC" },
       fresh: { col: "vacancy.createdAt", dir: "DESC" },
     };
+
     const sort = orderMap[query.sortBy] || orderMap.fresh;
-    qb.orderBy(sort.col as any, sort.dir as any);
+    qb.orderBy(sort.col, sort.dir);
 
     const [results, total] = await qb.take(limit).skip(skip).getManyAndCount();
+
     return {
-      meta: { total, page, lastPage: Math.ceil(total / limit) },
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit) || 0,
+      },
       data: results,
     };
   }
