@@ -84,7 +84,7 @@ const loginSchema = {
     password: Type.String({ minLength: 8 }),
   }),
   response: {
-    201: Type.Object({
+    200: Type.Object({
       success: Type.Boolean(),
       message: Type.String(),
       data: Type.Any(),
