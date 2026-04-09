@@ -141,7 +141,6 @@ module.exports = async (instance: FastifyInstance) => {
           ...data,
           verified: valid,
         });
-        await NotificationService.notifyValidationStatus(user.id, user.verified);
         break;
       case Role.SPECIALIST:
         user = userPool.create({
@@ -155,6 +154,7 @@ module.exports = async (instance: FastifyInstance) => {
     await userPool.save(user);
     const { password, ...userResponse } = user;
     const token = fastify.jwt.sign({ id: user.id, role: user.role });
+    await NotificationService.notifyValidationStatus(user.id, user.verified);
     return res
       .setCookie("access_token", token, {
         httpOnly: true,
@@ -256,7 +256,7 @@ module.exports = async (instance: FastifyInstance) => {
         });
         break;
     }
-    return res.status(200).send({
+    return res.status(206).send({
       success: true,
       data: {
         ...basicInfo,
