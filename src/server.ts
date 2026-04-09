@@ -55,6 +55,7 @@ server.register(fastifyJwt, {
   cookie: {
     cookieName: "access_token",
     signed: true,
+    credentials: true
   },
 });
 
