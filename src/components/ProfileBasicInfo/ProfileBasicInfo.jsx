@@ -83,11 +83,14 @@ export const ProfileBasicInfo = () => {
 
     const buildPayload = () => {
         const payload = {
-            phone: normalizePhone(formData.phone),
             gender: formData.gender || user.gender,
             city: formData.city || user.city,
             birthDate: user.birthDate,
         };
+
+        if (formData.phone && formData.phone.trim() !== "") {
+            payload.phone = normalizePhone(formData.phone);
+        }
 
         if (user.role === "employer") {
             payload.companyName = formData.companyName || user.companyName;
@@ -198,7 +201,6 @@ export const ProfileBasicInfo = () => {
                                     </select>
 
                                     <select
-                                        multiple
                                         value={formData.educations}
                                         onChange={handleEducationChange}
                                     >
