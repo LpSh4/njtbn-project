@@ -61,11 +61,12 @@ server.register(fastifyJwt, {
 server.register(helmet, {
   contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginOpenerPolicy: { policy: "unsafe-none" },
+  crossOriginEmbedderPolicy: false, // Add this
 });
 
+// 2. Update CORS to reflect origin (required for credentials)
 server.register(cors, {
-  origin: true, // Dynamically allows any origin that makes the request
+  origin: true, // This dynamically mirrors the request origin
   credentials: true,
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
