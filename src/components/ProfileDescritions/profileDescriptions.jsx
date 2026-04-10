@@ -1,8 +1,8 @@
-import "./profileDescriptions.scss";
-import edit from "./icons/edit.png";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useProfileUpdate } from "../../hooks/useProfileUpdate";
+import editIco from "./icons/edit.png";
+import "./profileDescriptions.scss";
 
 export const ProfileDescriptions = () => {
     const { user } = useContext(AuthContext);
@@ -13,21 +13,18 @@ export const ProfileDescriptions = () => {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        if (user) {
-            setDescription(user.description || "");
-        }
+        setDescription(user?.description || "");
     }, [user]);
 
     const handleSave = async () => {
-        const res = await updateProfile({
-            description,
-        });
+        if (description === user?.description) return setIsEdit(false);
 
+        const res = await updateProfile({ description });
         if (res.success) {
             setIsEdit(false);
             setError("");
         } else {
-            setError(res.errors?.description || "Error");
+            setError(res.errors?.description || "Failed to update");
         }
     };
 
@@ -35,36 +32,20 @@ export const ProfileDescriptions = () => {
         <section className="description">
             <div className="description__title">
                 <h2>Profile description</h2>
-
-                {!isEdit ? (
-                    <button onClick={() => setIsEdit(true)}>
-                        <img src={edit} alt="" />
-                    </button>
-                ) : (
-                    <button onClick={handleSave}>
-                        Save
-                    </button>
-                )}
+                <button onClick={isEdit ? handleSave : () => setIsEdit(true)}>
+                    {isEdit ? "Save" : <img src={editIco} alt="edit" />}
+                </button>
             </div>
-
             <div className="description__text-cont">
                 {isEdit ? (
                     <>
-                        <textarea
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Enter description..."
-                        />
+                        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Tell us about yourself..." />
                         {error && <span className="error">{error}</span>}
                     </>
                 ) : (
-                    <p>
-                        {user?.description || "No description yet"}
-                    </p>
+                    <p>{user?.description || "No description yet"}</p>
                 )}
             </div>
         </section>
     );
 };
-
-export default ProfileDescriptions;

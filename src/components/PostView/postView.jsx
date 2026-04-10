@@ -1,7 +1,7 @@
 import "./postView.scss"
 import {PostViewHead} from "../postViewHead/postViewHead.jsx"
 import {PostViewBody} from "../PostViewBody/postViewBody.jsx"
-import {PostViewProfile} from "../postViewProfile/postViewProfile.jsx"
+import {PostViewProfile} from "../PostViewProfile/PostViewProfile.jsx"
 
 
 export const PostView = ({ data, type }) => {

@@ -1,4 +1,4 @@
-import "./postViewBody.scss"
+import "./PostViewBody.scss"
 
 export const PostViewBody = ({ data, type }) => {
     const descriptionText =

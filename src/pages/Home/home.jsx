@@ -1,7 +1,7 @@
 import "./home.scss"
 import union from "./icons/hidden-gem.png"
 import { JobCard } from "../../components/JobCard/jobCard.jsx"
-import { ModalLogin } from "../../components/ModalLogin/ModalLogin.jsx"
+import { ModalLogin } from "../../components/ModalLogin/modalLogin.jsx"
 
 export const Home = ({ setIsLoginOpen, isLoginOpen }) => {
 

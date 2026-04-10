@@ -11,10 +11,19 @@ export const loginUser = (data) => {
 };
 
 export const checkAuth = () => {
-    const id = localStorage.getItem("userId");
+    // Try to get explicit userId, or pull it from the cached user object
+    let id = localStorage.getItem("userId");
 
     if (!id) {
-        return Promise.reject("No user id");
+        const cachedUser = localStorage.getItem("user");
+        if (cachedUser) {
+            const parsed = JSON.parse(cachedUser);
+            id = parsed.id || parsed._id; // Use whichever ID field your backend uses
+        }
+    }
+
+    if (!id) {
+        return Promise.reject("No user id found in storage");
     }
 
     return api.get(`/users/${id}`);

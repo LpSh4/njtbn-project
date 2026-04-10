@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { api } from "../../api/axios";
-import { PostView } from "../../components/PostView/PostView";
+import { PostView } from "../../components/PostView/postView.jsx";
 
 
 export const VacancyView = () => {

@@ -22,21 +22,9 @@ const EDUCATION_OPTIONS = [
 export const ProfileBasicInfo = () => {
     const { user } = useContext(AuthContext);
     const { updateProfile } = useProfileUpdate();
-
     const [isEdit, setIsEdit] = useState(false);
-
-    const [formData, setFormData] = useState({
-        phone: "",
-        gender: "",
-        city: "",
-        managerPosition: "",
-        companyName: "",
-        companyWebsite: "",
-        educations: [],
-        status: "",
-    });
-
     const [errors, setErrors] = useState({});
+    const [formData, setFormData] = useState({});
 
     useEffect(() => {
         if (user) {
@@ -55,201 +43,75 @@ export const ProfileBasicInfo = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-
-        setErrors((prev) => ({ ...prev, [name]: null }));
-    };
-
-    const handleEducationChange = (e) => {
-        const selected = Array.from(e.target.selectedOptions).map(
-            (opt) => opt.value
-        );
-
-        setFormData((prev) => ({
-            ...prev,
-            educations: selected,
-        }));
-    };
-
-    const normalizePhone = (phone) => {
-        return phone
-            .replace(/\D/g, "")
-            .replace(/^7/, "8");
-    };
-
-    const buildPayload = () => {
-        const payload = {
-            gender: formData.gender || user.gender,
-            city: formData.city || user.city,
-            birthDate: user.birthDate,
-        };
-
-        if (formData.phone && formData.phone.trim() !== "") {
-            payload.phone = normalizePhone(formData.phone);
-        }
-
-        if (user.role === "employer") {
-            payload.companyName = formData.companyName || user.companyName;
-            payload.managerPosition = formData.managerPosition || user.managerPosition;
-            payload.companyWebsite = formData.companyWebsite || user.companyWebsite;
-        }
-
-        if (user.role === "specialist") {
-            payload.status = formData.status || user.status;
-            payload.educations = formData.educations?.length
-                ? formData.educations
-                : user.educations;
-        }
-
-        return payload;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleSave = async (e) => {
         e.preventDefault();
 
-        try {
-            const res = await updateProfile(buildPayload());
+        // Clean phone number before sending
+        const cleanPhone = formData.phone.replace(/\D/g, "").replace(/^7/, "8");
+        const payload = { ...formData, phone: cleanPhone };
 
-            if (res.success) {
-                setIsEdit(false);
-                setErrors({});
-            } else {
-                setErrors(res.errors || {});
-            }
-        } catch (err) {
-            console.log("SAVE ERROR:", err);
+        const res = await updateProfile(payload);
+        if (res.success) {
+            setIsEdit(false);
+            setErrors({});
+        } else {
+            setErrors(res.errors || {});
         }
     };
+
+    if (!user) return null;
 
     return (
         <section className="info">
             <div className="info__redact">
                 <form onSubmit={handleSave}>
-                    <h2>User information:</h2>
+                    <h2>Basic Information</h2>
                     {isEdit ? (
-                        <>
-                            <input
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                placeholder="Phone"
-                            />
-                            {errors.phone && <span>{errors.phone}</span>}
+                        <div className="edit-grid">
+                            <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" />
+                            <input name="city" value={formData.city} onChange={handleChange} placeholder="City" />
 
-                            <input
-                                name="city"
-                                value={formData.city}
-                                onChange={handleChange}
-                                placeholder="City"
-                            />
-                            {errors.city && <span>{errors.city}</span>}
-
-                            <select
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                            >
-                                <option value="">Choose a gender</option>
+                            <select name="gender" value={formData.gender} onChange={handleChange}>
+                                <option value="notSpecified">Gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
-                                <option value="notSpecified">Not specified</option>
-                                <option value="other">Other</option>
                             </select>
 
                             {user.role === "employer" && (
                                 <>
-                                    <input
-                                        name="companyName"
-                                        value={formData.companyName}
-                                        onChange={handleChange}
-                                        placeholder="Company"
-                                    />
-
-                                    <input
-                                        name="managerPosition"
-                                        value={formData.managerPosition}
-                                        onChange={handleChange}
-                                        placeholder="Position"
-                                    />
-
-                                    <input
-                                        name="companyWebsite"
-                                        value={formData.companyWebsite}
-                                        onChange={handleChange}
-                                        placeholder="Website"
-                                    />
+                                    <input name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Company" />
+                                    <input name="managerPosition" value={formData.managerPosition} onChange={handleChange} placeholder="Position" />
                                 </>
                             )}
 
                             {user.role === "specialist" && (
-                                <>
-                                    <select
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="">Select the status</option>
-                                        {STATUS_OPTIONS.map((opt) => (
-                                            <option key={opt.value} value={opt.value}>
-                                                {opt.label}
-                                            </option>
-                                        ))}
-                                    </select>
-
-                                    <select
-                                        value={formData.educations}
-                                        onChange={handleEducationChange}
-                                    >
-                                        {EDUCATION_OPTIONS.map((opt) => (
-                                            <option key={opt.value} value={opt.value}>
-                                                {opt.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </>
+                                <select name="status" value={formData.status} onChange={handleChange}>
+                                    {STATUS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                                </select>
                             )}
 
-                            <button type="submit">Save</button>
-                        </>
+                            <button type="submit">Save Changes</button>
+                        </div>
                     ) : (
-                        <>
-                        <p>Phone: {formData.phone}</p>
-                        <p>City: {formData.city}</p>
-                            <p>Gender: {formData.gender}</p>
+                        <div className="view-grid">
+                            <p><strong>Phone:</strong> {user.phone || "—"}</p>
+                            <p><strong>City:</strong> {user.city || "—"}</p>
+                            <p><strong>Gender:</strong> {user.gender || "—"}</p>
 
-                            {user?.role === "employer" && (
-                                <>
-                                    <p>Company: {formData.companyName}</p>
-                                    <p>Position: {formData.managerPosition}</p>
-                                    <p>Website: {formData.companyWebsite}</p>
-                                </>
+                            {user.role === "employer" && (
+                                <p><strong>Company:</strong> {user.companyName} ({user.managerPosition})</p>
                             )}
 
-                            {user?.role === "specialist" && (
-                                <><p>
-                                    Status: {
-                                    STATUS_OPTIONS.find(s => s.value === formData.status)?.label || "—"
-                                }
-                                </p>
-
-                                    <p>
-                                        Education: {
-                                        formData.educations?.map(e =>
-                                            EDUCATION_OPTIONS.find(opt => opt.value === e)?.label
-                                        ).join(", ") || "—"
-                                    }
-                                    </p>
-                                </>
+                            {user.role === "specialist" && (
+                                <p><strong>Status:</strong> {STATUS_OPTIONS.find(s => s.value === user.status)?.label || "—"}</p>
                             )}
 
-                            <button type="button" onClick={() => setIsEdit(true)}>
-                                Redact
-                            </button>
-                        </>
+                            <button type="button" onClick={() => setIsEdit(true)}>Edit Info</button>
+                        </div>
                     )}
                 </form>
             </div>

@@ -14,7 +14,7 @@ import { ProfileEmployer } from "./pages/profileEmployer/profileEmployer.jsx";
 import { ProfileSpecialist } from "./pages/ProfileSpecialist/ProfileSpecialist.jsx";
 
 import { CreateResume } from "./pages/CreateResume/CreateResume.jsx";
-import { CreateVacancy } from "./pages/CreateVacancy/CreateVacancy.jsx";
+import { CreateVacancy } from "./pages/CreateVacancy/createVacancy.jsx";
 
 import { ResumeDeclarations } from "./pages/ResumeDeclarations/ResumeDeclarations.jsx";
 import { VacancyDeclarations } from "./pages/VacancyDeclarations/VacancyDeclarations.jsx";
