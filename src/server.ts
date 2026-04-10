@@ -16,17 +16,6 @@ const server = fastify({
 }).withTypeProvider<TypeBoxTypeProvider>();
 console.log("Server started");
 
-// server.ts - Move this to the VERY TOP of your plugin registrations
-server.register(cors, {
-  origin: "https://ryban.ru, http://localhost:3000", // No trailing slash
-  credentials: true,
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS", "PUT"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
-  // This is vital: it tells Fastify to reply to OPTIONS even if no route is defined
-  preflight: true,
-  optionsSuccessStatus: 204,
-});
-
 if (!process.env.JWT_KEY || !process.env.COOKIE_KEY) {
   throw new Error(".env missing crucial info");
 }
@@ -72,6 +61,21 @@ server.register(fastifyJwt, {
 server.register(helmet, {
   contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "unsafe-none" },
+});
+
+server.register(cors, {
+  origin: (origin, cb) => {
+    const allowedOrigins = ["http://localhost:3000", "https://ryban.ru"];
+    if (!origin || allowedOrigins.includes(origin)) {
+      cb(null, true);
+      return;
+    }
+    cb(new Error("Not allowed by CORS"), false);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 });
 
 server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply) => {
