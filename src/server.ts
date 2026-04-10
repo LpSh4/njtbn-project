@@ -65,17 +65,12 @@ server.register(helmet, {
 });
 
 server.register(cors, {
-  origin: (origin, cb) => {
-    const allowedOrigins = ["http://localhost:3000", "https://ryban.ru"];
-    if (!origin || allowedOrigins.includes(origin)) {
-      cb(null, true);
-      return;
-    }
-    cb(new Error("Not allowed by CORS"), false);
-  },
+  origin: ["http://localhost:3000", "https://ryban.ru"], // Simplified array is often safer
   credentials: true,
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Added X-Requested-With
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 });
 
 server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply) => {
