@@ -65,7 +65,7 @@ export class SearchService {
       qb.andWhere("resume.desired_salary_from >= :sf", { sf: query.salaryFrom });
     }
     if (query.salaryTo) {
-      qb.andWhere("resume.desired_salary_from <= :st", { st: query.salaryTo });
+      qb.andWhere("resume.desired_salary_from <= :sTo", { sTo: query.salaryTo });
     }
 
     if (query.expFrom) {
@@ -138,7 +138,7 @@ export class SearchService {
       qb.andWhere("vacancy.salary_from >= :sf", { sf: query.salaryFrom });
     }
     if (query.salaryTo) {
-      qb.andWhere("vacancy.salary_to <= :st", { st: query.salaryTo });
+      qb.andWhere("vacancy.salary_to <= :sTo", { sTo: query.salaryTo });
     }
     if (query.expFrom) {
       qb.andWhere("vacancy.experience >= :ef", { ef: query.expFrom });
