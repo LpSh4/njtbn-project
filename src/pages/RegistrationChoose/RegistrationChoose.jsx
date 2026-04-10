@@ -7,10 +7,10 @@ export const RegistrationChoose = () => {
         <>
         <section className="choose">
             <section className="choose__cont">
-                <h2>Кто регистрируется?</h2>
+                <h2>Who is registering?</h2>
                 <div className="choose__link-cont">
-                    <button onClick={() => navigate("/registerSpecialist")} className="choose__link">Специалист</button>
-                    <button onClick={() => navigate("/registerEmployer")}  className="choose__link">Работодатель </button>
+                    <button onClick={() => navigate("/registerSpecialist")} className="choose__link">Specialist</button>
+                    <button onClick={() => navigate("/registerEmployer")}  className="choose__link">Employer</button>
                 </div>
             </section>
 

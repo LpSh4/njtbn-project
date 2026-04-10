@@ -27,7 +27,7 @@ export const ProfileDescriptions = () => {
             setIsEdit(false);
             setError("");
         } else {
-            setError(res.errors?.description || "Ошибка");
+            setError(res.errors?.description || "Error");
         }
     };
 

@@ -9,136 +9,136 @@ export const Home = ({ setIsLoginOpen, isLoginOpen }) => {
         {
             id: 1,
             title: "Senior React Developer",
-            salary: "225000 - 280000 рублей",
+            salary: "225000 - 280000 RUB",
             company: "Google",
-            location: "Москва"
+            location: "Moscow"
         },
         {
             id: 2,
-            title: "Грузчик-комплектовщик",
-            salary: "67000 - 85000 рублей",
+            title: "Picker-Packer",
+            salary: "67000 - 85000 RUB",
             company: "Wildberries",
-            location: "Москва"
+            location: "Moscow"
         },
         {
             id: 3,
             title: "Frontend Developer (Vue.js)",
-            salary: "140000 - 190000 рублей",
-            company: "Яндекс",
-            location: "Москва"
+            salary: "140000 - 190000 RUB",
+            company: "Yandex",
+            location: "Moscow"
         },
         {
             id: 4,
-            title: "Водитель-курьер на личном авто",
-            salary: "90000 - 130000 рублей",
-            company: "Самокат",
-            location: "Москва"
+            title: "Delivery Driver (own car)",
+            salary: "90000 - 130000 RUB",
+            company: "Samokat",
+            location: "Moscow"
         },
         {
             id: 5,
             title: "Middle Python Backend Developer",
-            salary: "200000 - 250000 рублей",
+            salary: "200000 - 250000 RUB",
             company: "Sber",
-            location: "Москва"
+            location: "Moscow"
         },
         {
             id: 6,
-            title: "Повар сушист",
-            salary: "75000 - 95000 рублей",
-            company: "Додо Пицца",
-            location: "Москва"
+            title: "Sushi Chef",
+            salary: "75000 - 95000 RUB",
+            company: "Dodo Pizza",
+            location: "Moscow"
         }
-    ]
+    ];
 
     const jobsNews = [
         {
             id: 7,
-            title: "Менеджер по продажам (IT-решения)",
-            salary: "120000 - 250000 рублей",
+            title: "IT Solutions Sales Manager",
+            salary: "120000 - 250000 RUB",
             company: "Kaspersky",
-            location: "Москва"
+            location: "Moscow"
         },
         {
             id: 8,
-            title: "Младший Data Analyst",
-            salary: "110000 - 145000 рублей",
-            company: "Тинькофф",
-            location: "Москва"
+            title: "Junior Data Analyst",
+            salary: "110000 - 145000 RUB",
+            company: "Tinkoff",
+            location: "Moscow"
         },
         {
             id: 9,
-            title: "Электрик",
-            salary: "95000 - 120000 рублей",
-            company: "Мосэнерго",
-            location: "Москва"
+            title: "Electrician",
+            salary: "95000 - 120000 RUB",
+            company: "Mosenergo",
+            location: "Moscow"
         },
         {
             id: 10,
             title: "Product Manager (FinTech)",
-            salary: "230000 - 320000 рублей",
-            company: "Альфа-Банк",
-            location: "Москва"
+            salary: "230000 - 320000 RUB",
+            company: "Alfa-Bank",
+            location: "Moscow"
         },
         {
             id: 11,
-            title: "Продавец-консультант",
-            salary: "55000 - 80000 рублей",
-            company: "М.Видео",
-            location: "Москва"
+            title: "Sales Consultant",
+            salary: "55000 - 80000 RUB",
+            company: "M.Video",
+            location: "Moscow"
         },
         {
             id: 12,
             title: "DevOps Engineer",
-            salary: "240000 - 300000 рублей",
+            salary: "240000 - 300000 RUB",
             company: "VK",
-            location: "Москва"
+            location: "Moscow"
         }
-    ]
+    ];
 
     const jobsRecent = [
         {
             id: 13,
-            title: "Повар сушист",
-            salary: "75000 - 95000 рублей",
-            company: "Додо Пицца",
-            location: "Москва"
+            title: "Sushi Chef",
+            salary: "75000 - 95000 RUB",
+            company: "Dodo Pizza",
+            location: "Moscow"
         },
         {
             id: 14,
-            title: "Электрик",
-            salary: "95000 - 120000 рублей",
-            company: "Мосэнерго",
-            location: "Москва"
+            title: "Electrician",
+            salary: "95000 - 120000 RUB",
+            company: "Mosenergo",
+            location: "Moscow"
         },
         {
             id: 15,
-            title: "Медсестра / Медицинская сестра",
-            salary: "85000 - 110000 рублей",
-            company: "Городская клиническая больница №1",
-            location: "Москва"
+            title: "Nurse / Medical Nurse",
+            salary: "85000 - 110000 RUB",
+            company: "City Clinical Hospital №1",
+            location: "Moscow"
         },
         {
             id: 16,
-            title: "Сварщик",
-            salary: "100000 - 140000 рублей",
-            company: "Росатом",
-            location: "Москва"
+            title: "Welder",
+            salary: "100000 - 140000 RUB",
+            company: "Rosatom",
+            location: "Moscow"
         },
         {
             id: 17,
-            title: "Менеджер по продажам (IT-решения)",
-            salary: "120000 - 250000 рублей",
+            title: "IT Solutions Sales Manager",
+            salary: "120000 - 250000 RUB",
             company: "Kaspersky",
-            location: "Москва"
+            location: "Moscow"
         },
         {
             id: 18,
-            title: "Маркетолог цифровых каналов",
-            salary: "130000 - 180000 рублей",
-            company: "Леруа Мерлен",
-            location: "Москва"
+            title: "Digital Channels Marketer",
+            salary: "130000 - 180000 RUB",
+            company: "Leroy Merlin",
+            location: "Moscow"
         }
-    ]
+    ];
 
     return (
         <>
@@ -150,12 +150,12 @@ export const Home = ({ setIsLoginOpen, isLoginOpen }) => {
                         setIsLoginOpen(true);
                     }}
                 >
-                    <h2>Зарегистрируйтесь и ищите работу сейчас</h2>
+                    <h2>Register and look for a job now</h2>
 
                     <div className="filter__input">
                         <input
                             className="filter__search"
-                            placeholder="Введите номер телефона"
+                            placeholder="Enter your phone number"
                             type="search"
                             onFocus={() => setIsLoginOpen(true)}
                         />
@@ -164,7 +164,7 @@ export const Home = ({ setIsLoginOpen, isLoginOpen }) => {
                             type="submit"
                             onClick={() => setIsLoginOpen(true)}
                         >
-                            Продолжить
+                            Continue
                         </button>
                     </div>
                 </form>
@@ -173,7 +173,7 @@ export const Home = ({ setIsLoginOpen, isLoginOpen }) => {
             <section className="popular">
                 <div className="popular__title">
                     <img loading="lazy" src={union} alt="" />
-                    <h2>Популярное</h2>
+                    <h2>Popularity</h2>
                 </div>
 
                 <section className="popular__card-cont">
@@ -193,7 +193,7 @@ export const Home = ({ setIsLoginOpen, isLoginOpen }) => {
             <section className="popular">
                 <div className="popular__title">
                     <img loading="lazy" src={union} alt="" />
-                    <h2>Свежие</h2>
+                    <h2>Fresh</h2>
                 </div>
 
                 <section className="popular__card-cont">
@@ -213,7 +213,7 @@ export const Home = ({ setIsLoginOpen, isLoginOpen }) => {
             <section className="popular">
                 <div className="popular__title">
                     <img loading="lazy" src={union} alt="" />
-                    <h2>Недавно созданные</h2>
+                    <h2>Newly created</h2>
                 </div>
 
                 <section className="popular__card-cont">

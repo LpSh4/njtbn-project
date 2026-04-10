@@ -35,7 +35,7 @@ export const ModalLogin = ({ isOpen, setIsOpen }) => {
 
         } catch (e) {
             console.error("LOGIN ERROR:", e.response?.data || e);
-            alert("Ошибка входа");
+            alert("Login error");
         }
     };
 
@@ -48,26 +48,26 @@ export const ModalLogin = ({ isOpen, setIsOpen }) => {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="modalLogin__form">
-                <h2>Войдите в аккаунт</h2>
+                <h2>Log in to your account</h2>
 
                 <div className="modalLogin__input-field">
                     <div className="modalLogin__text-cont">
 
                         <p>
                             <label>Email</label>
-                            <input {...register("email", { required: "Введите email" })} type="email" />
+                            <input {...register("email", { required: "Enter your email address" })} type="email" />
                             <span className="error">{errors.email?.message}</span>
                         </p>
 
                         <p>
-                            <label>Пароль</label>
-                            <input {...register("password", { required: "Введите пароль" })} type="password" />
+                            <label>Password</label>
+                            <input {...register("password", { required: "Enter the password" })} type="password" />
                             <span className="error">{errors.password?.message}</span>
                         </p>
 
                     </div>
 
-                    <button type="submit">Войти</button>
+                    <button type="submit">SignIn</button>
 
                     <p
                         style={{ cursor: "pointer", marginTop: "10px" }}
@@ -76,7 +76,7 @@ export const ModalLogin = ({ isOpen, setIsOpen }) => {
                             navigate("/registerChoose");
                         }}
                     >
-                        Впервые здесь? Зарегистрироваться
+                        Is this your first time here? Register
                     </p>
                 </div>
             </form>

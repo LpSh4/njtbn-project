@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await api.post("/users/logout"); // если есть
+            await api.post("/users/logout");
         } catch (e) {
             console.log("Logout error:", e);
         }

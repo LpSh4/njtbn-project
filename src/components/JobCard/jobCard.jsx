@@ -21,7 +21,7 @@ export const JobCard = ({ title, salary, company, location, onClick }) => {
             </div>
             <div className="job-card__btn-cont">
                 <button onClick={onClick} className="job-card__btn">
-                    Узнать больше
+                    To learn more
                 </button>
             </div>
         </article>

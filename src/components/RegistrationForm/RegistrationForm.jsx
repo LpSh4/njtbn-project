@@ -57,27 +57,27 @@ const RegistrationForm = ({ role }) => {
 
         } catch (e) {
             console.error(e);
-            alert(e.response?.data?.message || "Ошибка регистрации");
+            alert(e.response?.data?.message || "Registration error");
         }
     };
     console.log(errors);
     return (
         <section className="employer">
             <section className="employer__cont">
-                <h2>Регистрация</h2>
+                <h2>Registration</h2>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="employer__form">
 
                     <div className="employer__input-cont">
 
                         <p>
-                            <label>Почта</label>
-                            <input {...register("email")} placeholder="Введите почту" />
+                            <label>Mail</label>
+                            <input {...register("email")} placeholder="Enter your email" />
                             <span className="error">{errors.email?.message}</span>
                         </p>
 
                         <p>
-                            <label>Телефон</label>
+                            <label>Tel</label>
 
                             <Controller
                                 name="phone"
@@ -99,13 +99,13 @@ const RegistrationForm = ({ role }) => {
                         </p>
 
                         <p>
-                            <label>Имя</label>
+                            <label>Name</label>
                             <input {...register("name")} />
                             <span className="error">{errors.name?.message}</span>
                         </p>
 
                         <p>
-                            <label>Фамилия</label>
+                            <label>First Name</label>
                             <input {...register("surname")} />
                             <span className="error">{errors.surname?.message}</span>
                         </p>
@@ -114,26 +114,26 @@ const RegistrationForm = ({ role }) => {
                     <div className="employer__input-cont">
 
                         <p>
-                            <label>Пароль</label>
+                            <label>Password</label>
                             <input type="password" {...register("password")} />
                             <span className="error">{errors.password?.message}</span>
                         </p>
 
                         <p>
-                            <label>Повторите пароль</label>
+                            <label>Repeat the password</label>
                             <input type="password" {...register("confirmPassword")} />
                             <span className="error">{errors.confirmPassword?.message}</span>
                         </p>
 
                         {role === "employer" && (
                             <p>
-                                <label>ИНН</label>
+                                <label>TIN</label>
                                 <input maxLength={12} minLength={10} {...register("tin")} />
                                 <span className="error">{errors.tin?.message}</span>
                             </p>
                         )}
 
-                        <button type="submit">Зарегистрироваться</button>
+                        <button type="submit">Register</button>
 
                     </div>
                 </form>
