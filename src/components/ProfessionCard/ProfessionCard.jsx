@@ -61,9 +61,6 @@ export const ProfessionCard = ({ data, role }) => {
                 <p>{truncate(role === "specialist" ? data.experienceDescription : data.description, maxLength)}</p>
             </div>
 
-            <div className="card__btn-cont">
-                <button>Learn more</button>
-            </div>
         </article>
     );
 };

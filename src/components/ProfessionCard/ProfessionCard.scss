@@ -15,7 +15,7 @@
 
 &__text-cont{
   width: 100%;
-  @include mixins.flex(row);
+  @include mixins.flex(row,space-between,center);
 column-gap: 120px;
   row-gap: 20px;
 
@@ -26,7 +26,7 @@ column-gap: 120px;
 
 
   @media (max-width: 850px) {
-    @include mixins.flex(row,space-between,center,wrap);
+    @include mixins.flex(row,center,center);
   }
 
 
@@ -42,6 +42,9 @@ column-gap: 120px;
     @media (max-width: 1050px) {
       @include mixins.flex(column, start,start);
 
+      @media (max-width: 850px) {
+        @include mixins.flex(column,start,start,wrap);
+      }
     }
 
     @media (max-width: 650px) {
@@ -50,10 +53,13 @@ column-gap: 120px;
     }
 
     h2{
-      font-size: 20px;
+      font-size: 26px;
       font-weight: bold;
     }
 
+    p{
+      font-size: 20px;
+    }
     button{
       margin-top: 31px;
       padding: 9px 0;

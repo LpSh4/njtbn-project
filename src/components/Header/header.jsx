@@ -39,9 +39,7 @@ export default function Header({ setIsLoginOpen }) {
                 </div>
                 <nav className="header__nav">
                     <ul className="header__list">
-                        <li><a href="">About the company</a></li>
-                        <li><a href="">Partners</a></li>
-                        <li><a href="">Software requirements</a></li>
+
                     </ul>
                 </nav>
             </div>
@@ -106,9 +104,7 @@ export default function Header({ setIsLoginOpen }) {
                             </>
                         )}
 
-                        <li className="mobile-menu__item"><a href="">About the company</a></li>
-                        <li className="mobile-menu__item"><a href="">Partners</a></li>
-                        <li className="mobile-menu__item"><a href="">Software requirements</a></li>
+                       
                     </ul>
                 </div>
             </div>
