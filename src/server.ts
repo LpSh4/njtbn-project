@@ -16,6 +16,23 @@ const server = fastify({
 }).withTypeProvider<TypeBoxTypeProvider>();
 console.log("Server started");
 
+server.register(cors, {
+  // Use a function for origin - it's much more reliable in production
+  origin: (origin, cb) => {
+    const hostname = origin ? new URL(origin).hostname : "";
+    if (!origin || hostname === "ryban.ru" || hostname === "localhost") {
+      cb(null, true);
+      return;
+    }
+    cb(new Error("Not allowed by CORS"), false);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+});
+
 if (!process.env.JWT_KEY || !process.env.COOKIE_KEY) {
   throw new Error(".env missing crucial info");
 }
@@ -62,15 +79,6 @@ server.register(helmet, {
   contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: "cross-origin" },
   crossOriginOpenerPolicy: { policy: "unsafe-none" },
-});
-
-server.register(cors, {
-  origin: ["http://localhost:3000", "https://ryban.ru"], // Simplified array is often safer
-  credentials: true,
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Added X-Requested-With
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
 });
 
 server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply) => {
