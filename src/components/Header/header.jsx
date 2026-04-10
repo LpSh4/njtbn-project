@@ -104,7 +104,7 @@ export default function Header({ setIsLoginOpen }) {
                             </>
                         )}
 
-                       
+
                     </ul>
                 </div>
             </div>
