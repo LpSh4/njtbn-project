@@ -4,19 +4,19 @@ import {AuthContext} from "../../context/AuthContext";
 import {useProfileUpdate} from "../../hooks/useProfileUpdate";
 
 const STATUS_OPTIONS = [
-    {value: "searching", label: "Ищу работу"},
-    {value: "inactive", label: "Не ищу"},
-    {value: "considering", label: "Рассматриваю"},
-    {value: "openToOffers", label: "Открыт к предложениям"},
+    {value: "searching", label: "Want job"},
+    {value: "inactive", label: "Not want"},
+    {value: "considering", label: "I'm considering"},
+    {value: "openToOffers", label: "I am open to suggestions"},
 ];
 
 const EDUCATION_OPTIONS = [
-    {value: "SECONDARY_VOCATIONAL", label: "Среднее спец."},
-    {value: "BACHELOR", label: "Бакалавр"},
-    {value: "SPECIALIST", label: "Специалист"},
-    {value: "MASTER", label: "Магистр"},
-    {value: "POSTGRADUATE", label: "Аспирантура"},
-    {value: "DOCTORAL", label: "Докторантура"},
+    {value: "SECONDARY_VOCATIONAL", label: "Average spec."},
+    {value: "BACHELOR", label: "Bachelor"},
+    {value: "SPECIALIST", label: "Specialist"},
+    {value: "MASTER", label: "Master"},
+    {value: "POSTGRADUATE", label: "Postgraduate study"},
+    {value: "DOCTORAL", label: "Doctoral studies"},
 ];
 
 export const ProfileBasicInfo = () => {
@@ -153,11 +153,11 @@ export const ProfileBasicInfo = () => {
                                 value={formData.gender}
                                 onChange={handleChange}
                             >
-                                <option value="">Выберите пол</option>
-                                <option value="male">Мужской</option>
-                                <option value="female">Женский</option>
-                                <option value="notSpecified">Не указан</option>
-                                <option value="other">Другой</option>
+                                <option value="">Choose a gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="notSpecified">Not specified</option>
+                                <option value="other">Other</option>
                             </select>
 
                             {user.role === "employer" && (
@@ -192,7 +192,7 @@ export const ProfileBasicInfo = () => {
                                         value={formData.status}
                                         onChange={handleChange}
                                     >
-                                        <option value="">Выберите статус</option>
+                                        <option value="">Select the status</option>
                                         {STATUS_OPTIONS.map((opt) => (
                                             <option key={opt.value} value={opt.value}>
                                                 {opt.label}
