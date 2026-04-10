@@ -17,15 +17,7 @@ const server = fastify({
 console.log("Server started");
 
 server.register(cors, {
-  // Use a function for origin - it's much more reliable in production
-  origin: (origin, cb) => {
-    const hostname = origin ? new URL(origin).hostname : "";
-    if (!origin || hostname === "ryban.ru" || hostname === "localhost") {
-      cb(null, true);
-      return;
-    }
-    cb(new Error("Not allowed by CORS"), false);
-  },
+  origin: "https://ryban.ru", // Match the frontend URL exactly
   credentials: true,
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
