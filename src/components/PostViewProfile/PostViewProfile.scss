@@ -1,0 +1,41 @@
+@use "../../styles/mixins";
+
+.postview-profile{
+  width:260px;
+  padding: 18px 0 18px 39px;
+  box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+  border-radius: 30px;
+  @include mixins.flex(column,start,start);
+  gap: 15px;
+  @media (max-width: 1150px) {
+    width: 800px;
+  }
+  @media (max-width: 850px) {
+    width: 600px;
+  }
+  @media (max-width: 650px) {
+    width: 400px;
+  }
+
+  @media (max-width: 450px) {
+    width: 300px;
+  }
+  &__info{
+    @include mixins.flex();
+    gap: 14px;
+
+    img{
+      width: 50px;
+    }
+
+    div{
+      @include mixins.flex(column,start,start);
+      gap: 5px;
+    }
+  }
+
+  &__content{
+    @include mixins.flex(column,start,start);
+    gap: 5px;
+  }
+}

@@ -1,7 +1,7 @@
 @use "../../styles/mixins";
 
 .card{
-  padding: 0 0 21px 0;
+  padding: 30px;
   width: 100%;
   @include mixins.flex(row,center,center);
   column-gap: 120px;

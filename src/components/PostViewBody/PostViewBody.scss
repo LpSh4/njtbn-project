@@ -1,0 +1,53 @@
+@use "../../styles/mixins";
+
+.view-body{
+  @include mixins.flex(column);
+  gap: 18px;
+
+  &__description{
+    width: 800px;
+    min-height: 500px;
+    padding:22px 0 32px 28px ;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+    border-radius: 30px;
+    @include mixins.flex(column,start,start);
+    gap: 18px;
+@media (max-width: 850px) {
+  width: 600px;
+}
+    @media (max-width: 650px) {
+      width: 400px;
+    }
+    @media (max-width: 450px) {
+      width: 300px;
+    }
+    h2{
+      font-size: 25px;
+      font-weight: bold;
+    }
+  }
+
+
+  &__required-cont{
+    @include mixins.flex(column);
+    gap: 19px;
+
+    h2{
+      font-size: 25px;
+      font-weight: bold;
+    }
+  }
+
+  &__required{
+    @include mixins.flex(row, center, center,wrap);
+    gap: 10px;
+  }
+
+  &__skill-cont{
+    padding: 10px 21px;
+    background-color: #3914AF;
+    border-radius: 10px;
+    color: white;
+
+  }
+}

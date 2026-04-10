@@ -89,13 +89,14 @@ export const CreatePost = ({ type, onPostCreated }) => {
                 const res = await api.post("/resumes/create", {
                     profession: formData.profession,
                     experience: Number(formData.experience),
-                    experienceDescription: formData.description,
+                    description: formData.description,
                     skills: formData.skills ? formData.skills.split(",").map(s => s.trim()) : [],
                     desiredSalaryFrom: Number(formData.salaryFrom),
                     city: formData.city,
                     workFormat: formData.workFormat,
                 });
-                newPost = res.data;
+
+                newPost = res.data.data;
             } else if (type === "vacancy") {
                 const res = await api.post("/vacancies/create", {
                     profession: formData.profession,
@@ -115,8 +116,8 @@ export const CreatePost = ({ type, onPostCreated }) => {
 
             alert(`${type === "resume" ? "Resume" : "Vacancy"} created successfully!`);
 
-            if (onPostCreated && newPost?.data) {
-                onPostCreated(newPost.data);
+            if (onPostCreated && newPost) {
+                onPostCreated(newPost);
             }
 
             navigate("/profile")

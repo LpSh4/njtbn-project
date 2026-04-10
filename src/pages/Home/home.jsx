@@ -1,8 +1,10 @@
 import "./home.scss"
 import union from "./icons/hidden-gem.png"
-import {JobCard} from "../../components/JobCard/jobCard.jsx";
+import { JobCard } from "../../components/JobCard/jobCard.jsx"
+import { ModalLogin } from "../../components/ModalLogin/ModalLogin.jsx"
 
-export const Home = ({ isLoginOpen, setIsLoginOpen }) => {
+export const Home = ({ setIsLoginOpen, isLoginOpen }) => {
+
     const jobsPopular = [
         {
             id: 1,
@@ -140,20 +142,39 @@ export const Home = ({ isLoginOpen, setIsLoginOpen }) => {
 
     return (
         <>
+            <section className="filter">
+                <form
+                    className="filter__form"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        setIsLoginOpen(true);
+                    }}
+                >
+                    <h2>Зарегистрируйтесь и ищите работу сейчас</h2>
 
+                    <div className="filter__input">
+                        <input
+                            className="filter__search"
+                            placeholder="Введите номер телефона"
+                            type="search"
+                            onFocus={() => setIsLoginOpen(true)}
+                        />
 
-<section className="filter">
-    <form action="" className="filter__form">
-        <h2>Зарегистрируйтесь и ищите работу сейчас</h2>
-        <div className="filter__input">
-            <input className="filter__search" placeholder={"Введите номер телефона"} type="search"/>
-            <button type={"submit"}>Продолжить</button>
-        </div>
-    </form>
-</section>
+                        <button
+                            type="submit"
+                            onClick={() => setIsLoginOpen(true)}
+                        >
+                            Продолжить
+                        </button>
+                    </div>
+                </form>
+            </section>
 
             <section className="popular">
-                <div className="popular__title"><img loading={"lazy"} src={union} alt=""/><h2>Популярное</h2></div>
+                <div className="popular__title">
+                    <img loading="lazy" src={union} alt="" />
+                    <h2>Популярное</h2>
+                </div>
 
                 <section className="popular__card-cont">
                     {jobsPopular.map(job => (
@@ -163,13 +184,17 @@ export const Home = ({ isLoginOpen, setIsLoginOpen }) => {
                             salary={job.salary}
                             company={job.company}
                             location={job.location}
+                            onClick={() => setIsLoginOpen(true)}
                         />
                     ))}
                 </section>
             </section>
 
             <section className="popular">
-                <div className="popular__title"><img loading={"lazy"} src={union} alt=""/><h2>Свежие</h2></div>
+                <div className="popular__title">
+                    <img loading="lazy" src={union} alt="" />
+                    <h2>Свежие</h2>
+                </div>
 
                 <section className="popular__card-cont">
                     {jobsNews.map(job => (
@@ -179,14 +204,17 @@ export const Home = ({ isLoginOpen, setIsLoginOpen }) => {
                             salary={job.salary}
                             company={job.company}
                             location={job.location}
+                            onClick={() => setIsLoginOpen(true)}
                         />
                     ))}
                 </section>
             </section>
 
-
             <section className="popular">
-                <div className="popular__title"><img loading={"lazy"} src={union} alt=""/><h2>Недавно созданные</h2></div>
+                <div className="popular__title">
+                    <img loading="lazy" src={union} alt="" />
+                    <h2>Недавно созданные</h2>
+                </div>
 
                 <section className="popular__card-cont">
                     {jobsRecent.map(job => (
@@ -196,13 +224,13 @@ export const Home = ({ isLoginOpen, setIsLoginOpen }) => {
                             salary={job.salary}
                             company={job.company}
                             location={job.location}
+                            onClick={() => setIsLoginOpen(true)}
                         />
                     ))}
                 </section>
             </section>
 
-
-
+            <ModalLogin isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} />
         </>
     )
 }

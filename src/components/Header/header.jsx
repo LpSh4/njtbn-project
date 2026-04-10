@@ -21,6 +21,9 @@ export default function Header({ setIsLoginOpen }) {
         location.pathname === "/profile" ||
         location.pathname === "/profileEmployer" ||
         location.pathname === "/profileSpecialist";
+    const isSearchPage =
+        location.pathname === "/resumes" ||
+        location.pathname === "/vacancies";
     const handleLogout = () => {
         logout();
         navigate("/");
@@ -48,10 +51,10 @@ export default function Header({ setIsLoginOpen }) {
                     <button onClick={() => setIsLoginOpen(true)}>SignIn</button>
                 ) : (
                     <>
-                        {role === "specialist" && (
+                        {role === "specialist" && !isSearchPage && (
                             <button onClick={() => navigate("/vacancies")}>Vacancy</button>
                         )}
-                        {role === "employer" && (
+                        {role === "employer" && !isSearchPage && (
                             <button onClick={() => navigate("/resumes")}>Resume</button>
                         )}
 

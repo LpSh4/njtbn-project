@@ -4,30 +4,38 @@ import { PostDeclarationsFilter } from "../PostDeclarationsFilter/PostDeclaratio
 import { PostDeclarationsCard } from "../PostDeclarationsCard/PostDeclarationsCard.jsx";
 import { api } from "../../api/axios";
 import { AuthContext } from "../../context/AuthContext.jsx";
+import { formatKeywords } from "../../utils/formatKeywords";
 
 export const PostDeclarations = ({ type }) => {
     const { role } = useContext(AuthContext);
+
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
 
+    const [search, setSearch] = useState("");
+    const [activeFilters, setActiveFilters] = useState({});
+
     const endpoint = type === "resume" ? "/resumes/search" : "/vacancies/search";
 
     const fetchDeclarations = async (filters = {}, pageNumber = 1) => {
         setLoading(true);
-        try {
-            const res = await api.get(endpoint, { params: { ...filters, page: pageNumber } });
 
-            if (res?.data?.data) {
-                setPosts(res.data.data);
-                setPage(res.data.meta?.page || 1);
-                setLastPage(res.data.meta?.lastPage || 1);
-            } else {
-                setPosts([]);
-            }
+        try {
+            const res = await api.get(endpoint, {
+                params: {
+                    ...filters,
+                    page: pageNumber
+                }
+            });
+
+            setPosts(res?.data?.data || []);
+            setPage(res?.data?.meta?.page || 1);
+            setLastPage(res?.data?.meta?.lastPage || 1);
+
         } catch (err) {
-            console.error("Error fetching declarations:", err);
+            console.error("FETCH ERROR:", err);
             setPosts([]);
         } finally {
             setLoading(false);
@@ -38,23 +46,56 @@ export const PostDeclarations = ({ type }) => {
         fetchDeclarations({}, 1);
     }, [endpoint]);
 
+
+    const handleFilters = (filters) => {
+        setActiveFilters(filters);
+        fetchDeclarations(filters, 1);
+    };
+
+
+    const handleSearch = () => {
+        const keywords = formatKeywords(search);
+
+        const params = {
+            ...activeFilters,
+            keywords
+        };
+
+        fetchDeclarations(params, 1);
+    };
+
     const handlePageChange = (newPage) => {
         if (newPage < 1 || newPage > lastPage) return;
-        fetchDeclarations({}, newPage);
+
+        fetchDeclarations(
+            {
+                ...activeFilters,
+                keywords: formatKeywords(search)
+            },
+            newPage
+        );
     };
 
     return (
         <section className="declaration">
+
             <aside className="declaration__filter">
                 <PostDeclarationsFilter
-                    onSubmit={(filters) => fetchDeclarations(filters, 1)}
+                    onSubmit={handleFilters}
                     type={type}
                 />
             </aside>
 
             <section className="declaration__content">
+
                 <div className="declaration__search">
-                    <input placeholder="Enter keywords" type="search" />
+                    <input
+                        placeholder="Enter keywords"
+                        type="search"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    />
                 </div>
 
                 <section className="declaration__post">
@@ -76,20 +117,18 @@ export const PostDeclarations = ({ type }) => {
 
                 {lastPage > 1 && (
                     <div className="pagination">
-                        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
+                        <button onClick={() => handlePageChange(page - 1)}>
                             Prev
                         </button>
-                        <span>
-                            {page} / {lastPage}
-                        </span>
-                        <button
-                            onClick={() => handlePageChange(page + 1)}
-                            disabled={page === lastPage}
-                        >
+
+                        <span>{page} / {lastPage}</span>
+
+                        <button onClick={() => handlePageChange(page + 1)}>
                             Next
                         </button>
                     </div>
                 )}
+
             </section>
         </section>
     );

@@ -1,52 +1,51 @@
 import { createContext, useState, useEffect } from "react";
 import { checkAuth } from "../api/authApi";
+import { api } from "../api/axios";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    useEffect(() => {
-        console.log("USER CHANGED:", user);
-    }, [user]);
-
     const [loading, setLoading] = useState(true);
 
-    const login = (userData) => {
-        if (typeof userData === "function") {
-            setUser(prev => userData(prev));
-        } else {
-            setUser(userData);
+    const login = (userData) => setUser(userData);
+
+    const logout = async () => {
+        try {
+            await api.post("/users/logout"); // если есть
+        } catch (e) {
+            console.log("Logout error:", e);
         }
-    };
-    const logout = () => {
         setUser(null);
+        localStorage.removeItem("user");
     };
 
     const isAuth = !!user;
     const role = user?.role;
 
     useEffect(() => {
-        const checkSession = async () => {
-            try {
-                const res = await checkAuth();
-
-
-                if (res?.data?.data) {
-                    setUser(res.data.data);
-                    console.log("AUTOLOGIN OK:", res.data.data);
+        const cachedUser = localStorage.getItem("user");
+        if (cachedUser) {
+            setUser(JSON.parse(cachedUser));
+            setLoading(false);
+        } else {
+            const checkSession = async () => {
+                try {
+                    const res = await checkAuth();
+                    if (res?.data?.data) setUser(res.data.data);
+                } catch (e) {
+                    console.log("No active session");
+                } finally {
+                    setLoading(false);
                 }
-
-            } catch (e) {
-                console.log("Нет активной сессии");
-
-
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        checkSession();
+            };
+            checkSession();
+        }
     }, []);
+
+    useEffect(() => {
+        if (user) localStorage.setItem("user", JSON.stringify(user));
+    }, [user]);
 
     return (
         <AuthContext.Provider value={{ user, role, isAuth, login, logout, loading }}>

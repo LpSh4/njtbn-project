@@ -10,29 +10,30 @@ const truncate = (text, max) => {
 export const ProfessionCard = ({ data, role }) => {
     if (!data) return null;
 
+    const experienceText = data.experience
+        ? `${data.experience} ${data.experience === 1 ? "year" : "years"}`
+        : "No experience";
+
+    const cityText = data.city || "Unknown";
+
     const firstContainer = role === "specialist"
         ? [
             { label: "Profession", value: data.profession },
-            { label: "Desired salary", value: `${data.desiredSalaryFrom} $` },
-            { label: "Work format", value: data.workFormat },
-            { label: "Created", value: new Date(data.createdAt).toLocaleString() },
+            { label: "Desired salary", value: `${data.desiredSalaryFrom || "—"} $` },
+            { label: "Work format", value: data.workFormat || "—" },
+            { label: "Created", value: data.createdAt ? new Date(data.createdAt).toLocaleString() : "—" },
         ]
         : [
             { label: "Profession", value: data.profession },
-            { label: "Salary", value: `${data.salaryFrom} - ${data.salaryTo} $` },
-            { label: "Work format", value: data.workFormat },
-            { label: "Created", value: new Date(data.createdAt).toLocaleString() },
+            { label: "Salary", value: `${data.salaryFrom || "—"} - ${data.salaryTo || "—"} $` },
+            { label: "Work format", value: data.workFormat || "—" },
+            { label: "Created", value: data.createdAt ? new Date(data.createdAt).toLocaleString() : "—" },
         ];
 
-    const secondContainer = role === "specialist"
-        ? [
-            { label: "Status", value: data.status || "Hidden" },
-            { label: "City / Experience", value: `${data.city} / ${data.experience} years` },
-        ]
-        : [
-            { label: "Status", value: data.status || "Hidden" },
-            { label: "City / Experience", value: `${data.city} / ${data.experience} years` },
-        ];
+    const secondContainer = [
+        { label: "Status", value: data.status || "Hidden" },
+        { label: "City / Experience", value: `${cityText} / ${experienceText}` },
+    ];
 
     return (
         <article className="card">
@@ -40,7 +41,9 @@ export const ProfessionCard = ({ data, role }) => {
                 <div className="card__text">
                     {firstContainer.map((item, idx) => (
                         <div key={idx}>
-                            {item.label === "Profession" ? <h2>{item.value}</h2> : <p>{item.value}</p>}
+                            {item.label === "Profession"
+                                ? <h2>{item.value}</h2>
+                                : <p>{item.value}</p>}
                         </div>
                     ))}
                 </div>

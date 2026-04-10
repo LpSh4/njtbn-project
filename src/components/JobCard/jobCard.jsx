@@ -1,6 +1,6 @@
 import "./jobCard.scss"
 
-export const JobCard = ({ title, salary, company, location }) => {
+export const JobCard = ({ title, salary, company, location, onClick }) => {
     const maxLength = 20
 
     const truncate = (text, max) => {
@@ -20,7 +20,7 @@ export const JobCard = ({ title, salary, company, location }) => {
                 </p>
             </div>
             <div className="job-card__btn-cont">
-                <button className="job-card__btn">
+                <button onClick={onClick} className="job-card__btn">
                     Узнать больше
                 </button>
             </div>

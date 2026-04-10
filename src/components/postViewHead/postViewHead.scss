@@ -1,0 +1,64 @@
+@use "../../styles/mixins";
+
+.view-head{
+width:800px;
+  padding: 18px 0 22px 28px ;
+  @include mixins.flex(column,start,start);
+  gap: 15px;
+  box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+  border-radius: 30px;
+  @media (max-width: 850px) {
+    width: 600px;
+  }
+
+  @media (max-width: 650px) {
+    width: 400px;
+  }
+  @media (max-width: 450px) {
+    width: 300px;
+  }
+  &__content{
+    @include mixins.flex(column,start,start);
+    gap: 21px;
+
+    h2{
+      font-size:35px;
+      font-weight: bold;
+    }
+  }
+
+  &__description{
+    @include mixins.flex(column,start,start);
+    gap: 21px;
+
+    p{
+      font-size:20px;
+    }
+
+    h3{
+      font-size:22px;
+      font-weight: bold;
+    }
+  }
+
+  &__text{
+    @include mixins.flex(column,start,start);
+    gap: 10px;
+
+    p{
+      @include mixins.flex(row);
+      gap: 13px;
+      font-size:18px;
+    }
+  }
+
+  button{
+    padding: 11px 0;
+    width: 278px;
+    background-color: #3914AF;
+    color: #fff;
+    @media (max-width: 450px) {
+      width: 200px;
+    }
+  }
+}

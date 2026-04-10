@@ -1,0 +1,19 @@
+@use "../../styles/mixins";
+
+.postview{
+  margin-top: 64px;
+  @include mixins.flex(row, center, start);
+  column-gap: 85px;
+@media (max-width: 1150px) {
+  @include mixins.flex(column-reverse, center, center);
+  gap: 25px;
+
+}
+  &__content{
+    @include mixins.flex(column, start,start);
+    gap:36px;
+    @media (max-width: 1150px) {
+      @include mixins.flex(column)
+    }
+  }
+}

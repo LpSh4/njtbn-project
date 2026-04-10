@@ -3,10 +3,12 @@
 .declaration-card{
   width: 1139px;
   padding: 31px 47px 44px 29px;
-  @include mixins.flex(row,start,center);
+  @include mixins.flex(row,start,start);
   gap: 40px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
   border-radius: 58px;
+  transition: 1s;
+
   @media (max-width: 1550px) {
     width: 939px;
   }
@@ -32,11 +34,28 @@
     width:339px;
   }
 
-
+&:hover{
+  transform: scale(1.04);
+}
 
   &__header{
+    padding-top:20px;
     @include mixins.flex(column);
-    gap: 2px;
+    gap: 20px;
+    text-align: center;
+
+    h3{
+      width: 100%;
+    }
+  }
+
+  &__header img {
+    width: 90px;
+    height: 90px;
+    min-width: 90px;
+    min-height: 90px;
+    object-fit: cover;
+    flex-shrink: 0;
   }
 
 &__body{
@@ -59,7 +78,7 @@
 
   &__text{
     @include mixins.flex(column,start,start);
-    gap: 44px;
+    gap: 24px;
     @media (max-width: 1150px) {
       @include mixins.flex(column);
     }
@@ -72,9 +91,22 @@
   &__description{
     @include mixins.flex(column,start,start);
     gap:19px;
+
     @media (max-width: 1150px) {
       @include mixins.flex(column);
     }
   }
 
+}
+
+
+.text-over{
+  width: 70%;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  @media (max-width: 1150px) {
+  text-align: center;
+  }
 }
