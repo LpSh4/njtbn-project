@@ -8,5 +8,5 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-    expose:
-               - "443"
+    ports:
+      - "443:443"
