@@ -186,7 +186,7 @@ module.exports = async (instance: FastifyInstance) => {
       .setCookie("access_token", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
+        sameSite: "lax",
         signed: true,
         path: "/",
       })

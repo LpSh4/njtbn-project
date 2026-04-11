@@ -19,6 +19,47 @@ console.log("Server started");
 if (!process.env.JWT_KEY || !process.env.COOKIE_KEY) {
   throw new Error(".env missing crucial info");
 }
+
+// 2. Update CORS to reflect origin (required for credentials)
+server.register(cors, {
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://ryban.ru",
+      "https://www.ryban.ru", // на всякий случай
+      "http://localhost:3000",
+      "http://127.0.0.1:3000", // иногда приходит так
+    ];
+
+    // Если origin отсутствует (same-site, некоторые инструменты) — разрешаем
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // true = разрешаем именно этот origin
+    } else {
+      callback(new Error("Not allowed by CORS"), false);
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400, // кэшируем preflight на 24 часа
+  exposedHeaders: ["set-cookie"], // если возвращаешь cookies в ответе
+});
+
+server.register(helmet, {
+  contentSecurityPolicy: false, // API обычно не нуждается
+  crossOriginResourcePolicy: false, // ← было "cross-origin" — часто мешает
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false,
+  hsts: true, // включаем, т.к. всё на HTTPS
+});
+
+server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply) => {
+  try {
+    req.user = await req.jwtVerify();
+  } catch {
+    return reply.status(401).send({ message: "Unauthorized" });
+  }
+});
+
 // ---- Swagger docs generation
 server.register(fastifySwagger, {
   openapi: {
@@ -56,28 +97,6 @@ server.register(fastifyJwt, {
     cookieName: "access_token",
     signed: true,
   },
-});
-
-server.register(helmet, {
-  contentSecurityPolicy: false,
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginEmbedderPolicy: false, // Add this
-});
-
-// 2. Update CORS to reflect origin (required for credentials)
-server.register(cors, {
-  origin: true, // This dynamically mirrors the request origin
-  credentials: true,
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-});
-
-server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply) => {
-  try {
-    req.user = await req.jwtVerify();
-  } catch {
-    return reply.status(401).send({ message: "Unauthorized" });
-  }
 });
 
 server.register(require("./routes/users"), { prefix: "/api/users" });
