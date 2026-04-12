@@ -13,11 +13,8 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-#   ./certs/ryban.ru.crt
-#   ./certs/ryban.ru.key
-COPY certs/ryban.ru.crt /etc/nginx/certs/ryban.ru.crt
-COPY certs/ryban.ru.key /etc/nginx/certs/ryban.ru.key
-COPY certs/ca.crt /etc/nginx/certs/ca.crt
+COPY /certs/fullchain.crt /etc/nginx/certs/fullchain.crt
+COPY /certs/certificate.key /etc/nginx/certs/certificate.key
 
 EXPOSE 443
 
