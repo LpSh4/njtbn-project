@@ -4,11 +4,7 @@ import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
 import fastifyCookie from "@fastify/cookie";
 import helmet from "@fastify/helmet";
-
-//Swagger generating
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
-import fastifySwagger from "@fastify/swagger";
-import fastifySwaggerUi from "@fastify/swagger-ui";
 
 const server = fastify({
   trustProxy: true,
@@ -28,32 +24,6 @@ server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply)
   }
 });
 
-// ---- Swagger docs generation
-server.register(fastifySwagger, {
-  openapi: {
-    info: {
-      title: "Ryban API",
-      description: "API Documentation for Ryban platform",
-      version: "1.0.0",
-    },
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-        },
-      },
-    },
-  },
-});
-
-server.register(fastifySwaggerUi, {
-  routePrefix: "/docs",
-  staticCSP: true,
-  transformStaticCSP: (header) => header,
-});
-
 server.register(require("./plugins/errorHandler"));
 server.register(fastifyCookie, {
   secret: process.env.COOKIE_KEY,
@@ -67,31 +37,19 @@ server.register(fastifyJwt, {
   },
 });
 
-// Helmet — минимум, чтобы не ломал CORS
-server.register(helmet, {
-  contentSecurityPolicy: false,
-  crossOriginResourcePolicy: false,
-  crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: false,
-  hsts: true, // можно true, раз всё на https
+server.register(cors, {
+  origin: ["https://ryban.ru", "https://www.ryban.ru", "http://localhost:3000"],
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 });
 
-// CORS — надёжная версия для production
-server.register(cors, {
-  origin: (origin, callback) => {
-    const allowed = ["https://ryban.ru", "https://www.ryban.ru"];
-
-    if (!origin || allowed.includes(origin)) {
-      callback(null, true); // возвращаем именно тот origin, который пришёл
-    } else {
-      callback(new Error("Not allowed by CORS"), false);
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  maxAge: 7200, // 2 часа
-  exposedHeaders: ["set-cookie"],
+server.register(helmet, {
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  hsts: true,
 });
 
 server.register(require("./routes/users"), { prefix: "/api/users" });
