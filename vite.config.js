@@ -8,7 +8,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://api.domain.ru',
+        target: 'https://api.ryban.ru',
         changeOrigin: true,
         secure: true,
 
