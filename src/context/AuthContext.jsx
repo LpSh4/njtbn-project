@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
         if (data) {
             setUser(data);
             localStorage.setItem("user", JSON.stringify(data));
-            // CRITICAL: Ensure userId is stored for checkAuth to work
+
             if (data.id || data._id) {
                 localStorage.setItem("userId", data.id || data._id);
             }
@@ -33,13 +33,13 @@ export const AuthProvider = ({ children }) => {
             const cachedUser = localStorage.getItem("user");
             if (cachedUser) {
                 setUser(JSON.parse(cachedUser));
-                // We set loading false so the app renders immediately with cached data
+
                 setLoading(false);
             }
 
             try {
                 const res = await checkAuth();
-                // Extract data based on your API structure
+
                 const userData = res?.data?.data || res?.data || res;
 
                 if (userData) {
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
                 }
             } catch (e) {
                 console.log("Session sync failed:", e);
-                // Only logout if we don't have a cache and the request failed
+
                 if (!cachedUser) {
                     setUser(null);
                     localStorage.removeItem("user");

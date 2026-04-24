@@ -50,7 +50,7 @@ export const ProfileBasicInfo = () => {
     const handleSave = async (e) => {
         e.preventDefault();
 
-        // Clean phone number before sending
+
         const cleanPhone = formData.phone.replace(/\D/g, "").replace(/^7/, "8");
         const payload = { ...formData, phone: cleanPhone };
 

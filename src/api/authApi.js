@@ -11,14 +11,13 @@ export const loginUser = (data) => {
 };
 
 export const checkAuth = () => {
-    // Try to get explicit userId, or pull it from the cached user object
     let id = localStorage.getItem("userId");
 
     if (!id) {
         const cachedUser = localStorage.getItem("user");
         if (cachedUser) {
             const parsed = JSON.parse(cachedUser);
-            id = parsed.id || parsed._id; // Use whichever ID field your backend uses
+            id = parsed.id || parsed._id;
         }
     }
 

@@ -24,7 +24,7 @@ export const ProfileUser = () => {
     }, [user]);
 
     const handleSave = async () => {
-        // Only send what changed to keep requests light
+
         const payload = {};
         if (formData.name !== user.name) payload.name = formData.name;
         if (formData.surname !== user.surname) payload.surname = formData.surname;
