@@ -18,24 +18,37 @@ export const ProfileProfession = () => {
                 ? `/vacancies/viewprofile/${user.id}`
                 : null;
 
+    console.log("Current user ID:", user?.id);
+    console.log("Full endpoint:", endpoint);
     useEffect(() => {
-        if (!endpoint) return;
+        if (!endpoint || !user?.id) return;
 
         const fetchPosts = async () => {
             try {
                 const res = await api.get(endpoint);
-                if (res?.data?.data) {
-                    setPosts(res.data.data);
+
+                const incomingData = res?.data?.data;
+
+                if (Array.isArray(incomingData)) {
+                    setPosts(incomingData);
+                } else if (incomingData && typeof incomingData === 'object') {
+                    setPosts([incomingData]);
+                } else {
+                    setPosts([]);
                 }
             } catch (err) {
-                console.error("Error fetching posts:", err);
+                if (err.response?.status === 404) {
+                    setPosts([]);
+                } else {
+                    console.error("Error fetching posts:", err);
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         fetchPosts();
-    }, [endpoint]);
+    }, [endpoint, user?.id]);
 
     const handleCreate = () => {
         if (role === "specialist") {
