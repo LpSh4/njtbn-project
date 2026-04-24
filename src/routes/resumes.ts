@@ -70,7 +70,6 @@ const searchSchema = {
       workFormat: {
         type: "string",
         enum: Object.values(ResumeWorkFormat),
-        default: ResumeWorkFormat.OFFICE,
       },
       sortBy: {
         type: "string",
