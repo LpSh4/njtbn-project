@@ -38,7 +38,12 @@ server.register(fastifyJwt, {
 });
 
 server.register(cors, {
-  origin: ["https://ryban.ru", "https://www.ryban.ru", "http://localhost:3000"],
+  origin: [
+    "https://ryban.ru",
+    "https://www.ryban.ru",
+    "http://localhost:3000",
+    "https://localhost:5173",
+  ],
   credentials: true,
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
