@@ -9,7 +9,6 @@ export const useProfileUpdate = () => {
             const res = await updateUser(data);
             if (res.status === 204 || res.status === 200) {
 
-
                 setUser((prevUser) => {
                     const nextUser = { ...prevUser, ...data };
                     localStorage.setItem("user", JSON.stringify(nextUser));

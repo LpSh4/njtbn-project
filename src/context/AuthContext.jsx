@@ -1,6 +1,6 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { checkAuth } from "../api/authApi";
+import { checkAuth, getUserProfile } from "../api/authApi";
 import { api } from "../api/axios";
 
 export const AuthContext = createContext();
@@ -10,30 +10,56 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    const refreshUser = useCallback(async () => {
+        try {
+            const authRes = await checkAuth();
+            const authData = authRes?.data?.data || authRes?.data || authRes;
+
+            if (authData && authData.id) {
+                const profileRes = await getUserProfile(authData.id);
+                const fullUserData = profileRes?.data?.data || profileRes?.data || profileRes;
+
+                setUser(fullUserData);
+                localStorage.setItem("user", JSON.stringify(fullUserData));
+                localStorage.setItem("userId", fullUserData.id);
+                return fullUserData;
+            }
+            return null;
+        } catch (e) {
+            console.error("Refresh user failed:", e);
+            if (e.response?.status === 401) {
+                logout(false);
+            }
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     const login = async (credentials) => {
         try {
             const response = await api.post('/users/login', credentials);
             const userData = response.data.data;
 
             if (userData) {
-                setUser(userData);
-
-                localStorage.setItem("user", JSON.stringify(userData));
                 localStorage.setItem("userId", userData.id);
 
-                if (userData.role === "employer") {
+                const fullData = await refreshUser();
+
+                const finalUser = fullData || userData;
+                if (finalUser.role === "employer") {
                     navigate("/profileEmployer");
                 } else {
                     navigate("/profileSpecialist");
                 }
             }
         } catch (error) {
-            console.error("Login error:", error.response?.data || error.message);
+            console.error("Login error:", error);
             throw error;
         }
     };
 
-    const logout = async () => {
+    const logout = async (shouldNavigate = true) => {
         try {
             await api.post("/users/logout");
         } catch (e) {
@@ -41,7 +67,7 @@ export const AuthProvider = ({ children }) => {
         }
         setUser(null);
         localStorage.clear();
-        navigate('/');
+        if (shouldNavigate) navigate('/');
     };
 
     useEffect(() => {
@@ -53,36 +79,17 @@ export const AuthProvider = ({ children }) => {
                 } catch (e) {
                     localStorage.removeItem("user");
                 }
-                setLoading(false);
             }
-
-            try {
-                const res = await checkAuth();
-                const userData = res?.data?.data || res?.data || res;
-
-                if (userData) {
-                    setUser(userData);
-                    localStorage.setItem("user", JSON.stringify(userData));
-                    localStorage.setItem("userId", userData.id);
-                }
-            } catch (e) {
-                console.log("Session sync failed:", e);
-
-                if (e.response?.status === 401) {
-                    setUser(null);
-                    localStorage.clear();
-                }
-            } finally {
-                setLoading(false);
-            }
+            await refreshUser();
         };
 
         initAuth();
-    }, []);
+    }, [refreshUser]);
 
     const value = {
         user,
         setUser,
+        refreshUser,
         role: user?.role,
         isAuth: !!user,
         login,
@@ -92,7 +99,11 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading ? children : <div className="loader">Loading...</div>}
+            {!loading ? children : (
+                <div className="loader-container">
+                    <div className="loader">Loading profile...</div>
+                </div>
+            )}
         </AuthContext.Provider>
     );
 };

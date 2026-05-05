@@ -140,6 +140,7 @@ export const ProfileBasicInfo = () => {
                     ) : (
 
                         <div className="view-grid">
+                            {}
                             {console.log("RENDER VIEW WITH USER:", user)}
 
                             <p><strong>Phone:</strong> {user?.phone || "—"}</p>

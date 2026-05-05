@@ -54,3 +54,5 @@ export const updateVacancy = (id, data) => {
 export const createResume = (data) => {
     return api.post("/resumes/create", data);
 };
+
+export const getUserProfile = checkAuth;

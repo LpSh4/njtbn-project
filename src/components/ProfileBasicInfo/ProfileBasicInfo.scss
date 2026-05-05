@@ -36,6 +36,7 @@
     form{
     @include mixins.flex(column,start,start);
       gap: 20px;
+
     }
 
     select{
