@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Header from "./components/Header/header.jsx";
 import { Footer } from "./components/footer/footer.jsx";
@@ -25,51 +25,67 @@ import { VacancyView } from "./pages/VacancyView/VacancyView.jsx";
 import { ModalLogin } from "./components/ModalLogin/modalLogin.jsx";
 import { AuthContext } from "./context/AuthContext";
 
+const PublicRoute = ({ user, children }) => {
+    if (user) {
+        return user.role === "employer"
+            ? <Navigate to="/profileEmployer" replace />
+            : <Navigate to="/profileSpecialist" replace />;
+    }
+    return children;
+};
+
 const App = () => {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
-    const { loading } = useContext(AuthContext);
+    const { loading, user } = useContext(AuthContext);
+
+    const handleToggleLogin = (value) => {
+        setIsLoginOpen(prev => {
+            if (prev === value) return prev;
+            return value;
+        });
+    };
 
     if (loading) return <div>Loading...</div>;
 
     return (
         <>
-            <Header setIsLoginOpen={setIsLoginOpen} />
+            <Header setIsLoginOpen={handleToggleLogin} />
 
             <main className={`main ${isLoginOpen ? "blur" : ""}`}>
                 <Routes>
-
+                    {}
                     <Route
                         path="/"
                         element={
-                            <Home
-                                isLoginOpen={isLoginOpen}
-                                setIsLoginOpen={setIsLoginOpen}
-                            />
+                            <PublicRoute user={user}>
+                                <Home isLoginOpen={isLoginOpen} setIsLoginOpen={handleToggleLogin} />
+                            </PublicRoute>
                         }
                     />
+                    <Route path="/registerChoose" element={<PublicRoute user={user}><RegistrationChoose /></PublicRoute>} />
+                    <Route path="/registerEmployer" element={<PublicRoute user={user}><RegistrationEmployer /></PublicRoute>} />
+                    <Route path="/registerSpecialist" element={<PublicRoute user={user}><RegistrationSpecialist /></PublicRoute>} />
 
-                    <Route path="/registerChoose" element={<RegistrationChoose />} />
-                    <Route path="/registerEmployer" element={<RegistrationEmployer />} />
-                    <Route path="/registerSpecialist" element={<RegistrationSpecialist />} />
-
+                    {}
                     <Route path="/profile" element={<ProfileRedirect />} />
                     <Route path="/profileEmployer" element={<ProfileEmployer />} />
                     <Route path="/profileSpecialist" element={<ProfileSpecialist />} />
 
+                    {}
                     <Route path="/createResume" element={<CreateResume />} />
                     <Route path="/createVacancy" element={<CreateVacancy />} />
 
-                    <Route path="/resumes" element={<ResumeDeclarations />} />
-                    <Route path="/vacancies" element={<VacancyDeclarations />} />
+                    {}
+                    <Route path="/resumes" element={<ResumeDeclarations setIsLoginOpen={handleToggleLogin} />} />
+                    <Route path="/vacancies" element={<VacancyDeclarations setIsLoginOpen={handleToggleLogin} />} />
 
-                    <Route path="/resume/:id" element={<ResumeView />} />
-                    <Route path="/vacancy/:id" element={<VacancyView />} />
-
+                    {}
+                    <Route path="/resume/:id" element={<ResumeView setIsLoginOpen={handleToggleLogin} />} />
+                    <Route path="/vacancy/:id" element={<VacancyView setIsLoginOpen={handleToggleLogin} />} />
                 </Routes>
             </main>
 
-            <ModalLogin isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} />
-
+            <ModalLogin isOpen={isLoginOpen} setIsOpen={handleToggleLogin} />
             <Footer />
         </>
     );

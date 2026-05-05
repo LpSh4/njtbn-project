@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { checkAuth, getUserProfile } from "../api/authApi";
 import { api } from "../api/axios";
 
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -80,11 +81,13 @@ export const AuthProvider = ({ children }) => {
                     localStorage.removeItem("user");
                 }
             }
+
             await refreshUser();
         };
 
         initAuth();
-    }, [refreshUser]);
+
+    }, []);
 
     const value = {
         user,
@@ -101,7 +104,7 @@ export const AuthProvider = ({ children }) => {
         <AuthContext.Provider value={value}>
             {!loading ? children : (
                 <div className="loader-container">
-                    <div className="loader">Loading profile...</div>
+                    <div className="loader">Loading <span className="point point-1">.</span> <span className="point point-2">.</span> <span className="point point-3">.</span></div>
                 </div>
             )}
         </AuthContext.Provider>

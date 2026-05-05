@@ -28,3 +28,46 @@ header>*{
   }
 }
 
+.loader-container{
+ min-width: 100vh;
+  min-height: 100vh;
+  background-color: #3914AF;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+
+  .loader{
+    color: white;
+    font-size: 50px;
+  }
+
+  .point{
+    color: white;
+  }
+  
+  .point-1{
+    animation: PointAnim 0.5s infinite ease-in-out;
+  }
+  
+  .point-2{
+    animation: PointAnim 0.8s infinite ease-in-out;
+
+  }
+  
+  .point-3{
+    animation: PointAnim 0.9s infinite ease-in-out;
+  }
+  
+  @keyframes PointAnim {
+    0%{
+      opacity: 0;
+  }
+
+    100%{
+      opacity: 1;
+    }
+    
+  }
+}
