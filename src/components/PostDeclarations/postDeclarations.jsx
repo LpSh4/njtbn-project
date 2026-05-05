@@ -30,6 +30,9 @@ export const PostDeclarations = ({ type }) => {
                 }
             });
 
+            console.log("SEARCH RESPONSE TYPE:", typeof res.data.data);
+            console.log("SEARCH DATA:", res.data.data);
+
             setPosts(res?.data?.data || []);
             setPage(res?.data?.meta?.page || 1);
             setLastPage(res?.data?.meta?.lastPage || 1);
@@ -54,11 +57,11 @@ export const PostDeclarations = ({ type }) => {
 
 
     const handleSearch = () => {
-        const keywords = formatKeywords(search);
+        const formattedKeywords = search.trim().split(/\s+/).join("+");
 
         const params = {
             ...activeFilters,
-            keywords
+            keywords: formattedKeywords
         };
 
         fetchDeclarations(params, 1);
