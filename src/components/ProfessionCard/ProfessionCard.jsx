@@ -10,28 +10,36 @@ const truncate = (text, max) => {
 export const ProfessionCard = ({ data, role }) => {
     if (!data) return null;
 
-    const experienceText = data.experience
-        ? `${data.experience} ${data.experience === 1 ? "year" : "years"}`
+    const rawExp = data.experience ?? data.resume?.experience;
+    const cityText = data.city ?? data.resume?.city ?? "Not specified";
+
+    const hasExperience = (typeof rawExp === 'number');
+    const experienceText = hasExperience
+        ? `${rawExp} ${rawExp === 1 ? "year" : "years"}`
         : "No experience";
 
-    const cityText = data.city || "Unknown";
+    const isResume = !!data.desiredSalaryFrom || !!data.resume?.desiredSalaryFrom;
 
-    const firstContainer = role === "specialist"
+    const desc = isResume
+        ? (data.experienceDescription ?? data.resume?.experienceDescription)
+        : (data.description ?? data.vacancy?.description);
+
+    const firstContainer = isResume
         ? [
-            { label: "Profession", value: data.profession },
-            { label: "Desired salary", value: `${data.desiredSalaryFrom || "—"} $` },
-            { label: "Work format", value: data.workFormat || "—" },
+            { label: "Profession", value: data.profession ?? data.resume?.profession },
+            { label: "Desired salary", value: `${data.desiredSalaryFrom ?? data.resume?.desiredSalaryFrom ?? "—"} $` },
+            { label: "Work format", value: data.workFormat ?? data.resume?.workFormat ?? "—" },
             { label: "Created", value: data.createdAt ? new Date(data.createdAt).toLocaleString() : "—" },
         ]
         : [
-            { label: "Profession", value: data.profession },
-            { label: "Salary", value: `${data.salaryFrom || "—"} - ${data.salaryTo || "—"} $` },
-            { label: "Work format", value: data.workFormat || "—" },
+            { label: "Profession", value: data.profession ?? data.vacancy?.profession },
+            { label: "Salary", value: `${data.salaryFrom ?? "—"} - ${data.salaryTo ?? "—"} $` },
+            { label: "Work format", value: data.workFormat ?? data.vacancy?.workFormat ?? "—" },
             { label: "Created", value: data.createdAt ? new Date(data.createdAt).toLocaleString() : "—" },
         ];
 
     const secondContainer = [
-        { label: "Status", value: data.status || "Hidden" },
+        { label: "Status", value: data.status || "active" },
         { label: "City / Experience", value: `${cityText} / ${experienceText}` },
     ];
 
@@ -58,9 +66,9 @@ export const ProfessionCard = ({ data, role }) => {
             </div>
 
             <div className="card__description">
-                <p>{truncate(role === "specialist" ? data.experienceDescription : data.description, maxLength)}</p>
+                {}
+                <p>{truncate(desc, maxLength)}</p>
             </div>
-
         </article>
     );
 };

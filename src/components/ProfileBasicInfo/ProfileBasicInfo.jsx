@@ -23,51 +23,84 @@ export const ProfileBasicInfo = () => {
     const { user } = useContext(AuthContext);
     const { updateProfile } = useProfileUpdate();
     const [isEdit, setIsEdit] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [formData, setFormData] = useState({});
+
+    const [formData, setFormData] = useState(() => ({
+        phone: user?.phone || "",
+        gender: user?.gender || "notSpecified",
+        city: user?.city || "",
+        managerPosition: user?.managerPosition || "",
+        companyName: user?.companyName || "",
+        companyWebsite: user?.companyWebsite || "",
+        educationLevel: user?.educationLevel || "",
+        status: user?.status || "searching",
+    }));
 
     useEffect(() => {
-        if (user) {
+        if (user && !isEdit) {
             setFormData({
                 phone: user.phone || "",
-                gender: user.gender || "",
+                gender: user.gender || "notSpecified",
                 city: user.city || "",
                 managerPosition: user.managerPosition || "",
                 companyName: user.companyName || "",
                 companyWebsite: user.companyWebsite || "",
-                educations: user.educations || [],
-                status: user.status || "",
+                educationLevel: user.educations?.[0] || user.educationLevel || "",
+                status: user.status || "searching",
             });
         }
-    }, [user]);
-
+    }, [user, isEdit]);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleSave = async (e) => {
         e.preventDefault();
 
+        const payload = {
+            name: user.name,
+            surname: user.surname,
+        };
 
-        const cleanPhone = formData.phone.replace(/\D/g, "").replace(/^7/, "8");
-        const payload = { ...formData, phone: cleanPhone };
+        if (formData.city?.trim()) payload.city = formData.city.trim();
+        if (formData.gender && formData.gender !== "notSpecified") payload.gender = formData.gender;
 
-        const res = await updateProfile(payload);
-        if (res.success) {
-            setIsEdit(false);
-            setErrors({});
+        if (formData.phone) {
+            let cleanPhone = formData.phone.replace(/\D/g, "");
+            if (cleanPhone) {
+                if (cleanPhone.startsWith("7")) cleanPhone = "8" + cleanPhone.slice(1);
+                if (!cleanPhone.startsWith("8")) cleanPhone = "8" + cleanPhone;
+                payload.phone = cleanPhone;
+            }
+        }
+
+        if (user.role === "employer") {
+            payload.companyName = formData.companyName?.trim() || "";
+            payload.managerPosition = formData.managerPosition?.trim() || "";
+            payload.companyWebsite = formData.companyWebsite?.trim() || "";
         } else {
-            setErrors(res.errors || {});
+            payload.status = formData.status;
+            if (formData.educationLevel) {
+                payload.educations = [formData.educationLevel];
+            }
+        }
+
+        try {
+            const success = await updateProfile(payload);
+            if (success) {
+                setIsEdit(false);
+            }
+        } catch (err) {
+            console.error("Save failed", err);
+            alert("Error saving data");
         }
     };
-
     if (!user) return null;
 
     return (
         <section className="info">
             <div className="info__redact">
+                {}
                 <form onSubmit={handleSave}>
                     <h2>Basic Information</h2>
                     {isEdit ? (
@@ -79,38 +112,64 @@ export const ProfileBasicInfo = () => {
                                 <option value="notSpecified">Gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
+                                <option value="other">Other</option>
                             </select>
+
+                            {user.role === "specialist" && (
+                                <>
+                                    <select name="status" value={formData.status} onChange={handleChange}>
+                                        {STATUS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                                    </select>
+                                    <select name="educationLevel" value={formData.educationLevel} onChange={handleChange}>
+                                        <option value="">Education Level</option>
+                                        {EDUCATION_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                                    </select>
+                                </>
+                            )}
 
                             {user.role === "employer" && (
                                 <>
                                     <input name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Company" />
                                     <input name="managerPosition" value={formData.managerPosition} onChange={handleChange} placeholder="Position" />
+                                    <input name="companyWebsite" value={formData.companyWebsite} onChange={handleChange} placeholder="Website" />
                                 </>
                             )}
 
-                            {user.role === "specialist" && (
-                                <select name="status" value={formData.status} onChange={handleChange}>
-                                    {STATUS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                                </select>
-                            )}
-
-                            <button type="submit">Save Changes</button>
+                            <button className="save" type="submit">Save Changes</button>
                         </div>
                     ) : (
+
                         <div className="view-grid">
-                            <p><strong>Phone:</strong> {user.phone || "—"}</p>
-                            <p><strong>City:</strong> {user.city || "—"}</p>
-                            <p><strong>Gender:</strong> {user.gender || "—"}</p>
+                            {console.log("RENDER VIEW WITH USER:", user)}
 
-                            {user.role === "employer" && (
-                                <p><strong>Company:</strong> {user.companyName} ({user.managerPosition})</p>
+                            <p><strong>Phone:</strong> {user?.phone || "—"}</p>
+                            <p><strong>City:</strong> {user?.city || "—"}</p>
+                            <p><strong>Gender:</strong> {user?.gender || "—"}</p>
+
+                            {user?.role === "specialist" && (
+                                <>
+                                    <p><strong>Status:</strong> {STATUS_OPTIONS.find(s => s.value === user.status)?.label || "—"}</p>
+                                    <p>
+                                        <strong>Education:</strong> {
+                                        EDUCATION_OPTIONS.find(e =>
+                                            e.value === user.educations?.[0] || e.value === user.educationLevel
+                                        )?.label || "—"
+                                    }
+                                    </p>
+                                </>
                             )}
 
-                            {user.role === "specialist" && (
-                                <p><strong>Status:</strong> {STATUS_OPTIONS.find(s => s.value === user.status)?.label || "—"}</p>
+                            {user?.role === "employer" && (
+                                <>
+                                    <p><strong>Company:</strong> {user.companyName || "—"}</p>
+                                    <p><strong>Position:</strong> {user.managerPosition || "—"}</p>
+                                    {user.companyWebsite && <p><strong>Website:</strong> {user.companyWebsite}</p>}
+                                </>
                             )}
 
-                            <button type="button" onClick={() => setIsEdit(true)}>Edit Info</button>
+                            <button type="button" onClick={() => setIsEdit(true)}>
+                                Edit Info
+                            </button>
                         </div>
                     )}
                 </form>

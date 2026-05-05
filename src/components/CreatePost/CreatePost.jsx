@@ -36,7 +36,6 @@ export const CreatePost = ({ type, onPostCreated }) => {
 
     const validate = () => {
         let errs = {};
-
         if (!formData.profession.trim()) errs.profession = "Profession is required";
         if (!formData.city.trim()) errs.city = "City is required";
 
@@ -47,16 +46,12 @@ export const CreatePost = ({ type, onPostCreated }) => {
             if (!formData.description.trim()) errs.description = "Description is required";
             if (!formData.deadLine) errs.deadLine = "Deadline is required";
             if (!formData.skills.trim()) errs.skills = "At least one skill is required";
-
-            if (formData.salaryFrom && isNaN(Number(formData.salaryFrom))) errs.salaryFrom = "Salary must be a number";
-            if (formData.salaryTo && isNaN(Number(formData.salaryTo))) errs.salaryTo = "Salary must be a number";
-            if (formData.experience && isNaN(Number(formData.experience))) errs.experience = "Experience must be a number";
         }
 
         if (type === "resume") {
             if (!WorkFormat.includes(formData.workFormat)) errs.workFormat = "Select valid work format";
-            if (!formData.experience || isNaN(Number(formData.experience))) errs.experience = "Experience is required and must be a number";
-            if (!formData.salaryFrom || isNaN(Number(formData.salaryFrom))) errs.salaryFrom = "Desired salary is required and must be a number";
+            if (!formData.experience || isNaN(Number(formData.experience))) errs.experience = "Experience (number) is required";
+            if (!formData.salaryFrom || isNaN(Number(formData.salaryFrom))) errs.salaryFrom = "Desired salary (number) is required";
         }
 
         setErrors(errs);
@@ -65,22 +60,8 @@ export const CreatePost = ({ type, onPostCreated }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("SUBMIT CLICKED");
 
-        if (!validate()) {
-            console.log("Validation failed", errors);
-            return;
-        }
-
-        if (formData.salaryFrom && formData.salaryTo && Number(formData.salaryFrom) > Number(formData.salaryTo)) {
-            setErrors(prev => ({ ...prev, salaryTo: "Salary To must be greater than Salary From" }));
-            return;
-        }
-
-        if (type === "vacancy" && !formData.skills?.trim()) {
-            setErrors(prev => ({ ...prev, skills: "At least one skill is required" }));
-            return;
-        }
+        if (!validate()) return;
 
         try {
             let newPost = null;
@@ -89,15 +70,15 @@ export const CreatePost = ({ type, onPostCreated }) => {
                 const res = await api.post("/resumes/create", {
                     profession: formData.profession,
                     experience: Number(formData.experience),
-                    description: formData.description,
-                    skills: formData.skills ? formData.skills.split(",").map(s => s.trim()) : [],
                     desiredSalaryFrom: Number(formData.salaryFrom),
                     city: formData.city,
                     workFormat: formData.workFormat,
+                    experienceDescription: formData.description,
+                    skills: formData.skills ? formData.skills.split(",").map(s => s.trim()) : [],
                 });
-
                 newPost = res.data.data;
-            } else if (type === "vacancy") {
+            }
+            else if (type === "vacancy") {
                 const res = await api.post("/vacancies/create", {
                     profession: formData.profession,
                     workFormat: formData.workFormat,
@@ -105,25 +86,22 @@ export const CreatePost = ({ type, onPostCreated }) => {
                     workingHours: formData.workingHours,
                     salaryFrom: formData.salaryFrom ? Number(formData.salaryFrom) : null,
                     salaryTo: formData.salaryTo ? Number(formData.salaryTo) : null,
-                    experience: formData.experience ? Number(formData.experience) : null,
+                    experience: Number(formData.experience) || 0,
                     city: formData.city,
                     description: formData.description,
                     deadLine: formData.deadLine,
                     requiredSkills: formData.skills ? formData.skills.split(",").map(s => s.trim()) : [],
                 });
-                newPost = res.data;
+                newPost = res.data.data;
             }
 
             alert(`${type === "resume" ? "Resume" : "Vacancy"} created successfully!`);
+            if (onPostCreated) onPostCreated(newPost);
+            navigate("/profile");
 
-            if (onPostCreated && newPost) {
-                onPostCreated(newPost);
-            }
-
-            navigate("/profile")
         } catch (err) {
             console.error("BACKEND ERROR:", err.response?.data);
-            alert("Error creating post");
+            alert(err.response?.data?.message || "Error creating post");
         }
     };
 
@@ -134,7 +112,6 @@ export const CreatePost = ({ type, onPostCreated }) => {
             <form className="post__form" onSubmit={handleSubmit}>
                 <div className="post__content">
                     <div className="post__input-field">
-
                         <p>
                             <label>{labelText("Vacancy profession", "Profession")}</label>
                             <input type="text" name="profession" value={formData.profession} onChange={handleChange} />
@@ -142,7 +119,7 @@ export const CreatePost = ({ type, onPostCreated }) => {
                         </p>
 
                         <p>
-                            <label>{labelText("Work format", "Work format")}</label>
+                            <label>Work format</label>
                             <select name="workFormat" value={formData.workFormat} onChange={handleChange}>
                                 <option value="">Select</option>
                                 {WorkFormat.map(wf => <option key={wf} value={wf}>{wf}</option>)}
@@ -158,60 +135,59 @@ export const CreatePost = ({ type, onPostCreated }) => {
                                         <option value="">Select</option>
                                         {WorkSchedule.map(ws => <option key={ws} value={ws}>{ws}</option>)}
                                     </select>
-                                    {errors.workSchedule && <span className="error">{errors.workSchedule}</span>}
                                 </p>
-
                                 <p>
                                     <label>Working hours</label>
                                     <select name="workingHours" value={formData.workingHours} onChange={handleChange}>
                                         <option value="">Select</option>
                                         {WorkingHours.map(wh => <option key={wh} value={wh}>{wh}</option>)}
                                     </select>
-                                    {errors.workingHours && <span className="error">{errors.workingHours}</span>}
                                 </p>
-
                                 <p>
                                     <label>Deadline</label>
                                     <input type="date" name="deadLine" value={formData.deadLine} onChange={handleChange} />
-                                    {errors.deadLine && <span className="error">{errors.deadLine}</span>}
-                                </p>
-
-                                <p>
-                                    <label>Required skills (comma separated)</label>
-                                    <input type="text" name="skills" value={formData.skills} onChange={handleChange} />
-                                    {errors.skills && <span className="error">{errors.skills}</span>}
                                 </p>
                             </>
                         )}
 
                         <p>
-                            <label>City</label>
-                            <input type="text" name="city" value={formData.city} onChange={handleChange} />
-                            {errors.city && <span className="error">{errors.city}</span>}
+                            <label>{type === "vacancy" ? "Required skills (comma separated)" : "Your skills (comma separated)"}</label>
+                            <input type="text" name="skills" value={formData.skills} onChange={handleChange} placeholder="React, Node, JS" />
                         </p>
 
                         <p>
-                            <label>Experience</label>
+                            <label>City</label>
+                            <input type="text" name="city" value={formData.city} onChange={handleChange} />
+                        </p>
+
+                        <p>
+                            <label>Experience (years)</label>
                             <input type="text" name="experience" value={formData.experience} onChange={handleChange} />
-                            {errors.experience && <span className="error">{errors.experience}</span>}
                         </p>
 
                         <div className="post__input-cont">
-                            <label>{labelText("Promised salary", "Desired salary")}</label>
-                            <div>
-                                <input placeholder="from" type="text" name="salaryFrom" value={formData.salaryFrom} onChange={handleChange} />
-                                <input placeholder="to" type="text" name="salaryTo" value={formData.salaryTo} onChange={handleChange} />
+                            <label>{labelText("Salary Range", "Desired Salary (from)")}</label>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <input
+                                    placeholder="from"
+                                    name="salaryFrom"
+                                    value={formData.salaryFrom}
+                                    onChange={handleChange}
+                                />
+                                {type === "vacancy" && (
+                                    <input
+                                        placeholder="to"
+                                        name="salaryTo"
+                                        value={formData.salaryTo}
+                                        onChange={handleChange}
+                                    />
+                                )}
                             </div>
-                            {(errors.salaryFrom || errors.salaryTo) && (
-                                <span className="error">{errors.salaryFrom || errors.salaryTo}</span>
-                            )}
                         </div>
-
 
                         <div className="description-cont">
                             <h2>Description</h2>
                             <textarea name="description" value={formData.description} onChange={handleChange} />
-                            {errors.description && <span className="error">{errors.description}</span>}
                         </div>
                     </div>
                 </div>

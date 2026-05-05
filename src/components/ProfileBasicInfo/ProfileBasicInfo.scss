@@ -67,3 +67,16 @@
     }
   }
 }
+
+.view-grid{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-grid{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+

@@ -33,9 +33,24 @@ export const updateUser = (data) => {
 };
 
 export const searchResumes = (params) => {
-    return api.post("/resumes/search", params);
+    return api.get("/resumes/search", { params });
 };
 
 export const searchVacancies = (params) => {
-    return api.post("/vacancies/search", params);
+    return api.get("/vacancies/search", { params });
+};
+
+export const updateResume = (id, data) => {
+    return api.patch(`/resumes/${id}`, data);
+};
+
+export const createVacancy = (data) => {
+    return api.post("/vacancies/create", data);
+};
+
+export const updateVacancy = (id, data) => {
+    return api.patch(`/vacancies/${id}`, data);
+}
+export const createResume = (data) => {
+    return api.post("/resumes/create", data);
 };

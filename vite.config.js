@@ -13,7 +13,6 @@ export default defineConfig({
       '/api': {
         target: 'https://api.ryban.ru',
         changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/api/, ''),
       },
     }
   },

@@ -1,4 +1,5 @@
-import { createContext, useState, useEffect, useCallback } from "react";
+import { createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { checkAuth } from "../api/authApi";
 import { api } from "../api/axios";
 
@@ -7,53 +8,69 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
-    const login = useCallback((userData) => {
-        const data = typeof userData === "function" ? userData(user) : userData;
+    const login = async (credentials) => {
+        try {
+            const response = await api.post('/users/login', credentials);
+            const userData = response.data.data;
 
-        if (data) {
-            setUser(data);
-            localStorage.setItem("user", JSON.stringify(data));
+            if (userData) {
+                setUser(userData);
 
-            if (data.id || data._id) {
-                localStorage.setItem("userId", data.id || data._id);
+                localStorage.setItem("user", JSON.stringify(userData));
+                localStorage.setItem("userId", userData.id);
+
+                if (userData.role === "employer") {
+                    navigate("/profileEmployer");
+                } else {
+                    navigate("/profileSpecialist");
+                }
             }
+        } catch (error) {
+            console.error("Login error:", error.response?.data || error.message);
+            throw error;
         }
-    }, [user]);
+    };
 
     const logout = async () => {
-        try { await api.post("/users/logout"); } catch (e) { console.log(e); }
+        try {
+            await api.post("/users/logout");
+        } catch (e) {
+            console.log("Logout error:", e);
+        }
         setUser(null);
-        localStorage.removeItem("user");
-        localStorage.removeItem("userId");
+        localStorage.clear();
+        navigate('/');
     };
 
     useEffect(() => {
         const initAuth = async () => {
             const cachedUser = localStorage.getItem("user");
             if (cachedUser) {
-                setUser(JSON.parse(cachedUser));
-
+                try {
+                    setUser(JSON.parse(cachedUser));
+                } catch (e) {
+                    localStorage.removeItem("user");
+                }
                 setLoading(false);
             }
 
             try {
                 const res = await checkAuth();
-
                 const userData = res?.data?.data || res?.data || res;
 
                 if (userData) {
                     setUser(userData);
                     localStorage.setItem("user", JSON.stringify(userData));
-                    localStorage.setItem("userId", userData.id || userData._id);
+                    localStorage.setItem("userId", userData.id);
                 }
             } catch (e) {
                 console.log("Session sync failed:", e);
 
-                if (!cachedUser) {
+                if (e.response?.status === 401) {
                     setUser(null);
-                    localStorage.removeItem("user");
-                    localStorage.removeItem("userId");
+                    localStorage.clear();
                 }
             } finally {
                 setLoading(false);
@@ -65,6 +82,7 @@ export const AuthProvider = ({ children }) => {
 
     const value = {
         user,
+        setUser,
         role: user?.role,
         isAuth: !!user,
         login,
