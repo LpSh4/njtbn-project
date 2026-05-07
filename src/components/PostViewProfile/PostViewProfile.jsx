@@ -2,39 +2,50 @@ import "./PostViewProfile.scss";
 import Ellipse from "./icons/Ellipse.png";
 
 export const PostViewProfile = ({ data, type }) => {
+
+    const companyDisplayName = data.companyName || data.company || "Company Name";
+    const contactName = data.name || data.contactPerson;
+
     return (
         <section className="postview-profile">
-
             <div className="postview-profile__info">
-                <img src={Ellipse} alt="" />
-
+                <img src={Ellipse} alt="Avatar" />
                 <div>
-                    <p>
+                    <p className="postview-profile__title">
                         {type === "vacancy"
-                            ? data.companyName || "Company"
-                            : `${data.name || ""} ${data.surname || data.surname || ""}`}
+                            ? companyDisplayName
+                            : `${data.name || "Name"} ${data.surname || ""}`.trim()}
                     </p>
-
-                    <p>
-                        {type === "vacancy"
-                            ? data.companyWebsite || "Website"
-                            : data.city || "City"}
-                    </p>
+                    {}
+                    <p className="postview-profile__city">{data.city || "Region not specified"}</p>
                 </div>
             </div>
 
             <div className="postview-profile__content">
+                {}
+                <p>Manager: {contactName || "Information hidden"}</p>
 
-                <p>
-                    Manager: {data.name || "Unknown"}
-                </p>
+                {}
+                {data.phone ? (
+                    <p>Phone: {data.phone}</p>
+                ) : (
+                    <p>Phone: {type === "vacancy" ? "Not provided" : "Hidden"}</p>
+                )}
 
-                <p>
-                    Phone: {data.phone || "Not available"}
-                </p>
-
+                {}
+                {data.companyWebsite ? (
+                    <p>
+                        <a href={data.companyWebsite.startsWith('http') ? data.companyWebsite : `https://${data.companyWebsite}`}
+                           target="_blank"
+                           rel="noreferrer"
+                           style={{ color: '#2b12b3', textDecoration: 'underline' }}>
+                            Visit Website
+                        </a>
+                    </p>
+                ) : (
+                    type === "vacancy" && <p className="no-data">Website: No link</p>
+                )}
             </div>
-
         </section>
     );
 };
