@@ -34,6 +34,14 @@
     width:339px;
   }
 
+
+  @media (max-width: 370px) {
+    @include mixins.flex(column,start,center);
+    width:299px;
+    border-radius: 20px;
+
+  }
+
 &:hover{
   transform: scale(1.04);
 }
@@ -85,6 +93,9 @@
     h2{
       font-size: 27px;
       font-weight: bold;
+      @media (max-width: 1150px) {
+        text-align: center;
+      }
     }
   }
 

@@ -15,8 +15,8 @@
 
 &__text-cont{
   width: 100%;
-  @include mixins.flex(row,space-between,center);
-column-gap: 120px;
+  @include mixins.flex(row,center,center);
+  column-gap: 400px;
   row-gap: 20px;
 
   @media (max-width: 1050px) {
@@ -31,7 +31,7 @@ column-gap: 120px;
 
 
   @media (max-width: 650px) {
-    @include mixins.flex(start,center,wrap);
+    @include mixins.flex(column,center,center,wrap);
   }
   }
 
@@ -69,6 +69,8 @@ column-gap: 120px;
       border-radius: 18px;
     }
   }
+
+
 
   &__description{
     @include mixins.flex();

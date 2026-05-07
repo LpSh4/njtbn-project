@@ -1,0 +1,71 @@
+@use "../../styles/mixins";
+
+
+.profile-view {
+
+  padding: 40px 20px;
+
+  &__container {
+    margin-top: 64px;
+    @include mixins.flex(row, center, start);
+    column-gap: 85px;
+    @media (max-width: 1150px) {
+      @include mixins.flex(column-reverse, center, center);
+      gap: 25px;
+    }
+  }
+  &__main {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+  }
+
+
+
+  &__bio {
+    width: 100%;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+    border-radius: 30px;
+    background: white;
+    padding: 30px;
+
+    @media (max-width: 1150px) {
+      width: 800px;
+    }
+    @media (max-width: 850px) {
+      width: 600px;
+    }
+    @media (max-width: 650px) {
+      width: 400px;
+    }
+
+    @media (max-width: 450px) {
+      width: 300px;
+    }
+
+    h1 { margin-bottom: 10px; }
+    .profile-view__role-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #eee;
+      border-radius: 10px;
+      font-size: 14px;
+      text-transform: capitalize;
+      margin-bottom: 20px;
+    }
+  }
+
+  &__posts {
+width: 100%;
+    @include mixins.flex(column);
+    h2 { margin-bottom: 20px; padding-left: 10px; }
+  }
+
+  &__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+  }
+}

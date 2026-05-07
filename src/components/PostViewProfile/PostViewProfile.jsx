@@ -1,51 +1,71 @@
+import { useNavigate, useLocation } from "react-router-dom";
 import "./PostViewProfile.scss";
 import Ellipse from "./icons/Ellipse.png";
 
 export const PostViewProfile = ({ data, type }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const companyDisplayName = data.companyName || data.company || "Company Name";
-    const contactName = data.name || data.contactPerson;
+
+    if (!data) return <div className="postview-profile">Loading...</div>;
+
+
+    const isSpecialist = type === "resume" || data.role === "specialist";
+
+    const displayName = isSpecialist
+        ? `${data.name || ""} ${data.surname || ""}`.trim() || "Candidate"
+        : (data.companyName || data.company || data.name || "Company Name");
+
+
+    const contactLabel = isSpecialist ? "Status" : "Manager";
+    const contactValue = isSpecialist ? (data.status || "Open to work") : (data.name || "Employer");
+
+
+    const userId = data.id || data.specialistid || data.managerid;
+    const isProfilePage = location.pathname.includes("/profile");
+
+    const handleCheckProfile = () => {
+        if (userId) navigate(`/profile/${userId}`);
+    };
 
     return (
         <section className="postview-profile">
             <div className="postview-profile__info">
                 <img src={Ellipse} alt="Avatar" />
                 <div>
-                    <p className="postview-profile__title">
-                        {type === "vacancy"
-                            ? companyDisplayName
-                            : `${data.name || "Name"} ${data.surname || ""}`.trim()}
-                    </p>
-                    {}
+                    <p className="postview-profile__title">{displayName}</p>
                     <p className="postview-profile__city">{data.city || "Region not specified"}</p>
                 </div>
             </div>
 
             <div className="postview-profile__content">
                 {}
-                <p>Manager: {contactName || "Information hidden"}</p>
+                <p>{contactLabel}: {contactValue}</p>
+
+                {data.phone && <p>Phone: {data.phone}</p>}
+
+                {data.email && <p>Email: {data.email}</p>}
 
                 {}
-                {data.phone ? (
-                    <p>Phone: {data.phone}</p>
-                ) : (
-                    <p>Phone: {type === "vacancy" ? "Not provided" : "Hidden"}</p>
-                )}
-
-                {}
-                {data.companyWebsite ? (
+                {!isSpecialist && (data.companyWebsite || data.website) ? (
                     <p>
-                        <a href={data.companyWebsite.startsWith('http') ? data.companyWebsite : `https://${data.companyWebsite}`}
+                        <a href={(data.companyWebsite || data.website).startsWith('http')
+                            ? (data.companyWebsite || data.website)
+                            : `https://${data.companyWebsite || data.website}`}
                            target="_blank"
                            rel="noreferrer"
-                           style={{ color: '#2b12b3', textDecoration: 'underline' }}>
+                           className="profile-link">
                             Visit Website
                         </a>
                     </p>
-                ) : (
-                    type === "vacancy" && <p className="no-data">Website: No link</p>
-                )}
+                ) : null}
             </div>
+
+            {!isProfilePage && userId && (
+                <button className="btn" onClick={handleCheckProfile}>
+                    check profile
+                </button>
+            )}
         </section>
     );
 };

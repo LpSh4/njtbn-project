@@ -107,7 +107,8 @@ label {
 }
 
 * {
-  color: white;
+  color: #000000;
+  font-family: Inter, Helvetica, sans-serif;
 }
 
 body {
@@ -122,6 +123,7 @@ body {
       -ms-flex-align: center;
           align-items: center;
   min-height: 100vh;
+  background-color: #f9f9f9;
 }
 
 body > * {
@@ -137,4 +139,62 @@ body > * {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+}
+
+header > * {
+  color: #ffffff;
+}
+header > * a {
+  color: #ffffff;
+}
+
+.loader-container {
+  min-width: 100vh;
+  min-height: 100vh;
+  background-color: #3914AF;
+  color: white;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.loader-container .loader {
+  color: white;
+  font-size: 50px;
+}
+.loader-container .point {
+  color: white;
+}
+.loader-container .point-1 {
+  -webkit-animation: PointAnim 0.5s infinite ease-in-out;
+          animation: PointAnim 0.5s infinite ease-in-out;
+}
+.loader-container .point-2 {
+  -webkit-animation: PointAnim 0.8s infinite ease-in-out;
+          animation: PointAnim 0.8s infinite ease-in-out;
+}
+.loader-container .point-3 {
+  -webkit-animation: PointAnim 0.9s infinite ease-in-out;
+          animation: PointAnim 0.9s infinite ease-in-out;
+}
+@-webkit-keyframes PointAnim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes PointAnim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

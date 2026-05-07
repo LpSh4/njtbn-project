@@ -1,0 +1,130 @@
+.profile-view {
+  padding: 40px 20px;
+}
+.profile-view__container {
+  margin-top: 64px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: start;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-column-gap: 85px;
+     -moz-column-gap: 85px;
+          column-gap: 85px;
+}
+@media (max-width: 1150px) {
+  .profile-view__container {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+        -ms-flex-direction: column-reverse;
+            flex-direction: column-reverse;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -ms-flex-wrap: nowrap;
+        flex-wrap: nowrap;
+    gap: 25px;
+  }
+}
+.profile-view__main {
+  width: 70%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 25px;
+}
+.profile-view__bio {
+  width: 100%;
+  -webkit-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+          box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 30px;
+  background: white;
+  padding: 30px;
+}
+@media (max-width: 1150px) {
+  .profile-view__bio {
+    width: 800px;
+  }
+}
+@media (max-width: 850px) {
+  .profile-view__bio {
+    width: 600px;
+  }
+}
+@media (max-width: 650px) {
+  .profile-view__bio {
+    width: 400px;
+  }
+}
+@media (max-width: 450px) {
+  .profile-view__bio {
+    width: 300px;
+  }
+}
+.profile-view__bio h1 {
+  margin-bottom: 10px;
+}
+.profile-view__bio .profile-view__role-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #eee;
+  border-radius: 10px;
+  font-size: 14px;
+  text-transform: capitalize;
+  margin-bottom: 20px;
+}
+.profile-view__posts {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+}
+.profile-view__posts h2 {
+  margin-bottom: 20px;
+  padding-left: 10px;
+}
+.profile-view__grid {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 35px;
+}

@@ -25,6 +25,8 @@ import { VacancyView } from "./pages/VacancyView/VacancyView.jsx";
 import { ModalLogin } from "./components/ModalLogin/modalLogin.jsx";
 import { AuthContext } from "./context/AuthContext";
 
+import {ProfileView} from "./pages/ProfileView/ProfileView.jsx";
+
 const PublicRoute = ({ user, children }) => {
     if (user) {
         return user.role === "employer"
@@ -82,6 +84,8 @@ const App = () => {
                     {}
                     <Route path="/resume/:id" element={<ResumeView setIsLoginOpen={handleToggleLogin} />} />
                     <Route path="/vacancy/:id" element={<VacancyView setIsLoginOpen={handleToggleLogin} />} />
+                    {}
+                    <Route path="/profile/:id" element={<ProfileView/>} />
                 </Routes>
             </main>
 

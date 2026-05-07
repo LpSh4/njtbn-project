@@ -1,10 +1,18 @@
 @use "../../styles/mixins";
 
-.postview-profile{
-  width:260px;
-  padding: 18px 0 18px 39px;
+.btn{
+  background-color: #3914AF;
+  padding: 10px;
+  color: white;
+  border-radius: 12px;
+}
+
+.postview-profile {
+
+  padding: 20px;
   box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
   border-radius: 30px;
+  background: #fff;
   @include mixins.flex(column,start,start);
   gap: 15px;
   @media (max-width: 1150px) {
@@ -37,5 +45,11 @@
   &__content{
     @include mixins.flex(column,start,start);
     gap: 5px;
+  }
+
+  .profile-link {
+    color: #3914AF;
+    text-decoration: underline;
+    font-weight: bold;
   }
 }
