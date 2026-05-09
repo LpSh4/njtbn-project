@@ -52,21 +52,22 @@ export const PostDeclarationsFilter = ({ onSubmit, type }) => {
 
                     <div className="search-filter__input-field">
                         <label>Wage $</label>
-                        <p>
+                        {}
+                        <div className="search-filter__inputs-row">
                             <input name="salaryFrom" placeholder="From" type="number" onChange={handleChange} />
                             <input name="salaryTo" placeholder="To" type="number" onChange={handleChange} />
-                        </p>
+                        </div>
                     </div>
 
-                    <p>
-                        <label>Experience (years)</label>
                         <div className="search-filter__input-field">
-                            <p>
+                            <label>Experience (years)</label>
+
+                            {}
+                            <div className="search-filter__inputs-row">
                                 <input name="expFrom" placeholder="From" type="number" onChange={handleChange} />
                                 <input name="expTo" placeholder="To" type="number" onChange={handleChange} />
-                            </p>
+                            </div>
                         </div>
-                    </p>
 
                     <p>
                         <label>Job format</label>

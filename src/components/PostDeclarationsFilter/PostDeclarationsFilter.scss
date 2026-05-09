@@ -61,14 +61,19 @@
     @media(max-width: 950px) {
       width: 100%;
     }
-    p{
+    div{
+      width: 100%;
       @include mixins.flex();
       column-gap:19px;
       row-gap:5px;
       input{
         width: 100%;
+        padding: 8px;
+        border: solid 1px  #1e1e1e;
+        border-radius: 20px;
       }
     }
+
   }
 
 

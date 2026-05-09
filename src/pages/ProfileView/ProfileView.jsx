@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { api } from "../../api/axios";
 import { PostViewProfile } from "../../components/PostViewProfile/PostViewProfile.jsx";
 import { PostDeclarationsCard } from "../../components/PostDeclarationsCard/PostDeclarationsCard.jsx";
+
 import "./ProfileView.scss";
 
 export const ProfileView = () => {
@@ -13,27 +15,27 @@ export const ProfileView = () => {
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
-                
-                const userRes = await fetch(`/api/users/${id}`);
-                const userData = await userRes.json();
-                const currentUser = userData.data;
+                const userRes = await api.get(`/users/${id}`);
+                const currentUser = userRes.data.data;
                 setUser(currentUser);
 
+                const postsUrl = currentUser.role === "specialist"
+                    ? `/resumes/viewprofile/${id}`
+                    : `/vacancies/viewprofile/${id}`;
 
-                let postsUrl = "";
-                if (currentUser.role === "specialist") {
-                    postsUrl = `/api/resumes/viewprofile/${id}`;
-                } else {
-                    postsUrl = `/api/vacancies/viewprofile/${id}`;
+                try {
+                    const postsRes = await api.get(postsUrl);
+                    setPosts(postsRes.data.data || []);
+                } catch (postError) {
+                    if (postError.response && postError.response.status === 404) {
+                        setPosts([]);
+                    } else {
+                        console.error("Ошибка при загрузке постов:", postError);
+                    }
                 }
 
-                const postsRes = await fetch(postsUrl);
-                const postsData = await postsRes.json();
-
-                setPosts(postsData.data || []);
-
             } catch (error) {
-                console.error("Ошибка загрузки:", error);
+                console.error("Ошибка загрузки профиля:", error);
             } finally {
                 setLoading(false);
             }
@@ -47,6 +49,7 @@ export const ProfileView = () => {
 
     return (
         <main className="profile-view">
+            <h2 className="profile-view__title">Profile</h2>
             <div className="profile-view__container">
                 {}
                 <div className="profile-view__main">

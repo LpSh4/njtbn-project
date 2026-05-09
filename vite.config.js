@@ -13,6 +13,7 @@ export default defineConfig({
       '/api': {
         target: 'https://api.ryban.ru',
         changeOrigin: true,
+        secure: false,
       },
     }
   },

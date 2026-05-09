@@ -5,6 +5,11 @@
 
   padding: 40px 20px;
 
+&__title{
+    text-align: center;
+    font-size: 30px;
+  font-weight: bold;
+  }
   &__container {
     margin-top: 64px;
     @include mixins.flex(row, center, start);

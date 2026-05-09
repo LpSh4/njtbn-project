@@ -74,20 +74,20 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const initAuth = async () => {
             const cachedUser = localStorage.getItem("user");
+            const cachedUserId = localStorage.getItem("userId");
+
             if (cachedUser) {
-                try {
-                    setUser(JSON.parse(cachedUser));
-                } catch (e) {
-                    localStorage.removeItem("user");
-                }
+                setUser(JSON.parse(cachedUser));
             }
 
-            await refreshUser();
+            if (cachedUserId) {
+                await refreshUser();
+            } else {
+                setLoading(false);
+            }
         };
-
         initAuth();
-
-    }, []);
+    }, [refreshUser]);
 
     const value = {
         user,
