@@ -3,6 +3,8 @@ import { AuthContext } from "../../context/AuthContext.jsx";
 import "./header.scss";
 import logo from "./icons/logo.png";
 import menu from "./icons/Menu.png";
+import notification from "./icons/notification.png";
+
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 
@@ -33,14 +35,11 @@ export default function Header({ setIsLoginOpen }) {
     return (
         <header className="header">
             <div className="header__element-cont">
-
                 <div className="header__img">
                     <img src={logo} alt="" />
                 </div>
                 <nav className="header__nav">
-                    <ul className="header__list">
-
-                    </ul>
+                    <ul className="header__list"></ul>
                 </nav>
             </div>
 
@@ -49,6 +48,11 @@ export default function Header({ setIsLoginOpen }) {
                     <button onClick={() => setIsLoginOpen(true)}>SignIn</button>
                 ) : (
                     <>
+                        {}
+                        <div className="header__notification" onClick={() => navigate("/notifications")}>
+                            <img style={{ width: "25px" }} src={notification} alt="Notifications" />
+                        </div>
+
                         {role === "specialist" && !isSearchPage && (
                             <button onClick={() => navigate("/vacancies")}>Vacancy</button>
                         )}
@@ -66,6 +70,13 @@ export default function Header({ setIsLoginOpen }) {
             </div>
 
             <div className="burger">
+                {}
+                {isAuth && (
+                    <div className="header__notification" onClick={() => navigate("/notifications")}>
+                        <img style={{ width: "25px" }} src={notification} alt="Notifications" />
+                    </div>
+                )}
+
                 <button
                     className="burger__btn"
                     onClick={() => setIsOpen(!isOpen)}
@@ -103,8 +114,6 @@ export default function Header({ setIsLoginOpen }) {
                                 </li>
                             </>
                         )}
-
-
                     </ul>
                 </div>
             </div>

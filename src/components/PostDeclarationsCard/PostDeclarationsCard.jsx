@@ -11,6 +11,7 @@ export const PostDeclarationsCard = ({ data, type }) => {
         : (data.companyName || data.company || data.name);
 
     const handleClick = () => {
+        console.log("Данные карточки:", data); 
         const path = type === "resume" ? "resume" : "vacancy";
         navigate(`/${path}/${data.id}`);
     };

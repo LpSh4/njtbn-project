@@ -16,31 +16,25 @@ export const ProfileView = () => {
         const fetchProfileData = async () => {
             try {
                 const userRes = await api.get(`/users/${id}`);
-                const currentUser = userRes.data.data;
-                setUser(currentUser);
+                const profileOwner = userRes.data.data;
+                console.log("КТО ЭТО?", profileOwner.role, profileOwner.name);
+                setUser(profileOwner);
 
-                const postsUrl = currentUser.role === "specialist"
+                const isSpecialist = profileOwner.role === "specialist";
+                const postsUrl = isSpecialist
                     ? `/resumes/viewprofile/${id}`
                     : `/vacancies/viewprofile/${id}`;
 
-                try {
-                    const postsRes = await api.get(postsUrl);
-                    setPosts(postsRes.data.data || []);
-                } catch (postError) {
-                    if (postError.response && postError.response.status === 404) {
-                        setPosts([]);
-                    } else {
-                        console.error("Ошибка при загрузке постов:", postError);
-                    }
-                }
+                const postsRes = await api.get(postsUrl);
+                setPosts(postsRes.data.data || []);
 
             } catch (error) {
                 console.error("Ошибка загрузки профиля:", error);
+                if (error.response?.status === 404) setPosts([]);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchProfileData();
     }, [id]);
 

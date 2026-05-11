@@ -13,16 +13,17 @@ export const ResumeView = () => {
             try {
                 const res = await api.get(`/resumes/${id}`);
 
-                const raw = res.data?.data || res.data;
+                const content = res.data?.data;
 
-                if (!raw) {
+                if (!content) {
                     setError(true);
                     return;
                 }
 
-                const normalized = raw.resume
-                    ? { ...raw.resume, ...raw.user }
-                    : raw;
+
+                const normalized = content.resume
+                    ? { ...content.resume, ...content.user }
+                    : content;
 
                 setData(normalized);
             } catch (e) {
@@ -34,8 +35,8 @@ export const ResumeView = () => {
         if (id) fetchResume();
     }, [id]);
 
-    if (error) return <p className="error-404">Error 404 not found</p>;
-    if (!data) return <p className="loader">Loading...</p>;
+    if (error) return <p className="error-404">Резюме не найдено (404)</p>;
+    if (!data) return <p className="loader">Загрузка...</p>;
 
     return <PostView data={data} type="resume" />;
 };

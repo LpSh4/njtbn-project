@@ -1,45 +1,60 @@
 import "./ProfileProfession.scss";
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { ProfessionCard } from "../ProfessionCard/ProfessionCard.jsx";
 import { api } from "../../api/axios";
 
 export const ProfileProfession = () => {
-    const { user, role } = useContext(AuthContext);
+    const { user: currentUser, role: currentRole } = useContext(AuthContext);
+    const { id: profileId } = useParams();
+
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [targetRole, setTargetRole] = useState(null);
     const navigate = useNavigate();
 
-    const endpoint =
-        role === "specialist"
-            ? `/resumes/viewprofile/${user?.id}`
-            : role === "employer"
-                ? `/vacancies/viewprofile/${user?.id}`
-                : null;
+    const effectiveId = profileId || currentUser?.id;
+    const isOwnProfile = !profileId || (currentUser?.id && profileId === currentUser.id);
 
     const handleCreate = () => {
-        if (role === "specialist") {
-            navigate("/createResume");
-        } else if (role === "employer") {
-            navigate("/createVacancy");
-        }
+        if (currentRole === "specialist") navigate("/createResume");
+        else if (currentRole === "employer") navigate("/createVacancy");
     };
 
     useEffect(() => {
-        if (!user?.id || !endpoint) return;
-
-        const fetchPosts = async () => {
+        const getProfileInfo = async () => {
+            if (!effectiveId) return;
+            setLoading(true);
             try {
+                let roleToUse = null;
+
+                if (!isOwnProfile) {
+                    const userRes = await api.get(`/users/${effectiveId}`);
+                    roleToUse = userRes.data?.data?.role;
+                } else {
+                    roleToUse = currentRole;
+                }
+
+                setTargetRole(roleToUse);
+
+                if (!roleToUse) {
+                    setLoading(false);
+                    return;
+                }
+
+                const endpoint = roleToUse === "specialist"
+                    ? `/resumes/viewprofile/${effectiveId}`
+                    : `/vacancies/viewprofile/${effectiveId}`;
+
                 const res = await api.get(endpoint);
                 const incomingData = res?.data?.data;
-
-                console.log("RAW DATA FROM BACKEND:", incomingData);
 
                 if (Array.isArray(incomingData)) {
                     setPosts(incomingData);
                 } else if (incomingData && typeof incomingData === 'object') {
-                    const actualData = incomingData.resume || incomingData.vacancy || incomingData;
+                    const actualData = incomingData.resumes || incomingData.vacancies ||
+                        incomingData.resume || incomingData.vacancy || incomingData;
                     setPosts(Array.isArray(actualData) ? actualData : [actualData]);
                 } else {
                     setPosts([]);
@@ -52,15 +67,14 @@ export const ProfileProfession = () => {
             }
         };
 
-        fetchPosts();
-    }, [endpoint, user?.id]);
+        getProfileInfo();
+    }, [effectiveId, isOwnProfile, currentRole]);
 
-    if (!user?.id && loading) return <p>Loading user data...</p>;
-    if (loading) return <p>Loading posts...</p>;
+    if (loading) return <p className="loader">Loading posts...</p>;
 
     return (
         <section className="profession">
-            <h2>{role === "specialist" ? "Resumes" : "Vacancies"}</h2>
+            <h2>{targetRole === "specialist" ? "Resumes" : "Vacancies"}</h2>
 
             {posts.length === 0 ? (
                 <h3>It's empty so far</h3>
@@ -71,18 +85,19 @@ export const ProfileProfession = () => {
                             key={post.id || idx}
                             data={{
                                 ...post,
-                                city: post.city || user.city || "Unknown",
-                                experience: post.experience ?? post.exp ?? user.experience ?? user.exp
+                                city: post.city || "Unknown",
                             }}
-                            role={role}
+                            role={targetRole}
                         />
                     ))}
                 </section>
             )}
 
-            <button onClick={handleCreate}>
-                {role === "specialist" ? "Add Resume" : "Add Vacancy"}
-            </button>
+            {isOwnProfile && currentRole && (
+                <button onClick={handleCreate}>
+                    {currentRole === "specialist" ? "Add Resume" : "Add Vacancy"}
+                </button>
+            )}
         </section>
     );
 };
