@@ -177,6 +177,8 @@ module.exports = async (fastify: FastifyInstance) => {
               createdAt: resume.createdAt,
               views: resume.views,
               status: resume.status,
+              city: resume.city,
+              experience: resume.experience,
             }
           : {
               id,

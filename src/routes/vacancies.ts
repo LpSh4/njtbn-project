@@ -185,6 +185,9 @@ module.exports = async (fastify: FastifyInstance) => {
               salaryTo,
               status: vacancy.status,
               views: vacancy.views,
+              workSchedule: vacancy.workSchedule,
+              workingHours: vacancy.workingHours,
+              description: vacancy.description,
             }
           : {
               id,

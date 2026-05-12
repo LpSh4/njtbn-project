@@ -227,6 +227,7 @@ module.exports = async (instance: FastifyInstance) => {
 
     const basicInfo: any = {
       name: user.name,
+      role: user.role,
       surname: user.surname,
       email: user.email,
       phone: user.phone,
