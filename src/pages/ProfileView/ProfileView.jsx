@@ -17,8 +17,8 @@ export const ProfileView = () => {
             try {
                 const userRes = await api.get(`/users/${id}`);
                 const profileOwner = userRes.data.data;
-                console.log("КТО ЭТО?", profileOwner.role, profileOwner.name);
                 setUser(profileOwner);
+                console.log("КТО ЭТО?", profileOwner.role, profileOwner.name);
 
                 const isSpecialist = profileOwner.role === "specialist";
                 const postsUrl = isSpecialist
