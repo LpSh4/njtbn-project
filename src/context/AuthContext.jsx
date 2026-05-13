@@ -11,25 +11,28 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+
     const refreshUser = useCallback(async () => {
+        setLoading(true);
         try {
             const authRes = await checkAuth();
             const authData = authRes?.data?.data || authRes?.data || authRes;
 
-            if (authData && authData.id) {
+            if (authData && authData.id && authData.id !== "undefined") {
                 const profileRes = await getUserProfile(authData.id);
                 const fullUserData = profileRes?.data?.data || profileRes?.data || profileRes;
 
                 setUser(fullUserData);
                 localStorage.setItem("user", JSON.stringify(fullUserData));
                 localStorage.setItem("userId", fullUserData.id);
+                localStorage.setItem("role", fullUserData.role);
                 return fullUserData;
             }
-            return null;
         } catch (e) {
             console.error("Refresh user failed:", e);
-            if (e.response?.status === 401) {
-                logout(false);
+            if (e.response?.status === 404 || e.response?.status === 401) {
+                localStorage.clear();
+                setUser(null);
             }
             return null;
         } finally {
@@ -40,19 +43,14 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             const response = await api.post('/users/login', credentials);
-            const userData = response.data.data;
+            const userData = response.data.data || response.data;
 
             if (userData) {
                 localStorage.setItem("userId", userData.id);
+                if (userData.role) localStorage.setItem("role", userData.role);
 
                 const fullData = await refreshUser();
-
-                const finalUser = fullData || userData;
-                if (finalUser.role === "employer") {
-                    navigate("/profileEmployer");
-                } else {
-                    navigate("/profileSpecialist");
-                }
+                return fullData || userData;
             }
         } catch (error) {
             console.error("Login error:", error);
@@ -73,16 +71,14 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const initAuth = async () => {
-            const cachedUser = localStorage.getItem("user");
-            const cachedUserId = localStorage.getItem("userId");
-
-            if (cachedUser) {
-                setUser(JSON.parse(cachedUser));
-            }
-
-            if (cachedUserId) {
-                await refreshUser();
-            } else {
+            try {
+                const cachedUserId = localStorage.getItem("userId");
+                if (cachedUserId) {
+                    await refreshUser();
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
                 setLoading(false);
             }
         };

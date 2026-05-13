@@ -9,7 +9,7 @@ export function NotificationsPage() {
     useEffect(() => {
         const fetchAllNotifications = async () => {
             try {
-                const res = await api.get('/applicaitons');
+                const res = await api.get('/applications');
                 setNotifications(res.data.data || []);
             } catch (err) {
                 console.error("Ошибка при загрузке откликов", err);

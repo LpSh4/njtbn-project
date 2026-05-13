@@ -67,7 +67,6 @@ export const ProfessionCard = ({ data, role }) => {
 
             <div className="card__description">
                 {}
-                <p>{truncate(desc, maxLength)}</p>
             </div>
         </article>
     );

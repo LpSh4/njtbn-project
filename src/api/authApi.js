@@ -56,3 +56,24 @@ export const createResume = (data) => {
 };
 
 export const getUserProfile = checkAuth;
+
+
+export const createApplication = (vacancyId) => {
+    return api.post(`/applications/apply/${vacancyId}`);
+};
+
+export const getApplicationsByVacancy = (vacancyId) => {
+    return api.get(`/applications/view/${vacancyId}`);
+};
+
+export const getAllMyApplications = () => {
+    return api.get("/applications/");
+};
+
+export const updateApplicationStatus = (applicationId, status) => {
+    return api.patch(`/applications/${applicationId}`, { status });
+};
+
+export const deleteApplication = (applicationId) => {
+    return api.delete(`/applications/${applicationId}`);
+};

@@ -18,20 +18,23 @@
 
         const onSubmit = async (data) => {
             try {
-
-                await login({
+                const user = await login({
                     email: data.email,
                     password: data.password
                 });
 
+                if (user) {
+                    setIsOpen(false);
+                    window.location.reload();
 
-                setIsOpen(false);
-
+                }
             } catch (e) {
                 console.error("LOGIN ERROR:", e.response?.data || e);
                 alert(e.response?.data?.message || "Login error");
             }
         };
+
+
 
         return (
             <section className={`modalLogin ${isOpen ? "active" : ""}`}>
