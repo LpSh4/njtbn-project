@@ -1,13 +1,13 @@
-import { FastifyInstance } from "fastify";
-import { Role, Gender, ProfileStatus, EducationLevel } from "../entities/User";
+import {FastifyInstance} from "fastify";
+import {EducationLevel, Gender, ProfileStatus, Role} from "../entities/User";
 // noinspection ES6UnusedImports
-import { fastifyCookie } from "@fastify/cookie";
-import { Database } from "../datasource";
-import { ValidateTIN } from "../services/ValidateTIN";
-import { NotificationService } from "../services/NotificationService";
-import { PoolService } from "../services/PoolService";
-import { ConflictError, NotFoundError, RequestError, UnauthorizedError } from "../services/ErrorService";
-import { Type, TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import {fastifyCookie} from "@fastify/cookie";
+import {Database} from "../datasource";
+import {ValidateTIN} from "../services/ValidateTIN";
+import {NotificationService} from "../services/NotificationService";
+import {PoolService} from "../services/PoolService";
+import {ConflictError, NotFoundError, RequestError, UnauthorizedError} from "../services/ErrorService";
+import {Type, TypeBoxTypeProvider} from "@fastify/type-provider-typebox";
 
 const bcrypt = require("bcrypt");
 const validateTIN = new ValidateTIN();
@@ -215,7 +215,7 @@ module.exports = async (instance: FastifyInstance) => {
   });
 
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
-    const userRepo = Database.getRepository("User");
+    const userRepo = PoolService.getUserPool();
 
     let user = await userRepo.findOne({ where: { id: req.params.id } });
 
