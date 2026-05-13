@@ -230,23 +230,25 @@ module.exports = async (fastify: FastifyInstance) => {
         return res.status(404).send({ success: false, message: "User not found" });
       }
       await vacancyPool.increment({ id: vacancy.id }, "views", 1);
-      const compiledData = {
-        profession: vacancy.profession,
-        salaryFrom: vacancy.salaryFrom,
-        salaryTo: vacancy.salaryTo,
-        experience: vacancy.experience,
-        workSchedule: vacancy.workSchedule,
-        workingHours: vacancy.workingHours,
-        workFormat: vacancy.workFormat,
-        city: vacancy.city,
-        requiredSkills: vacancy.requiredSkills,
-        status: vacancy.status,
-        companyName: user.companyName,
-        companyWebsite: user.companyWebsite,
-        phoneNumber: user.phoneNumber,
-        id: user.id,
-        name: user.name,
-      };
+        const compiledData = {
+            id: vacancy.id,
+            profession: vacancy.profession,
+            description: vacancy.description, // Я умни доабвил сам :3
+            salaryFrom: vacancy.salaryFrom,
+            salaryTo: vacancy.salaryTo,
+            experience: vacancy.experience,
+            workSchedule: vacancy.workSchedule,
+            workingHours: vacancy.workingHours,
+            workFormat: vacancy.workFormat,
+            city: vacancy.city,
+            requiredSkills: vacancy.requiredSkills,
+            status: vacancy.status,
+            companyName: user.companyName,
+            companyWebsite: user.companyWebsite,
+            phoneNumber: user.phoneNumber,
+            managerId: user.id,
+            name: user.name,
+        };
       return res.status(206).send({ success: true, message: "OK", data: compiledData });
     },
   );
