@@ -215,8 +215,8 @@ module.exports = async (instance: FastifyInstance) => {
   });
 
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
-    const userPool = PoolService.getUserPool();
-    let user = await userPool.findOne({ where: { id: req.params.id } });
+    const userRepo = Database.getRepository("User");
+    let user = await userRepo.findOne({ where: { id: req.params.id } });
     if (!user) {
       throw new NotFoundError("User not found");
     }
