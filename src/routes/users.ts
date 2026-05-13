@@ -216,10 +216,13 @@ module.exports = async (instance: FastifyInstance) => {
 
   fastify.get<{ Params: userParams }>("/:id", { preHandler: fastify.authenticate }, async (req, res) => {
     const userRepo = Database.getRepository("User");
+
     let user = await userRepo.findOne({ where: { id: req.params.id } });
+
     if (!user) {
       throw new NotFoundError("User not found");
     }
+
     if (req.user.id === req.params.id) {
       const { password, ...fullData } = user as any;
       return res.status(200).send({ success: true, message: "OK", data: fullData });
@@ -234,34 +237,25 @@ module.exports = async (instance: FastifyInstance) => {
       gender: user.gender,
       description: user.description,
       socialLinks: user.socialLinks,
-      verified: user.verified,
+      verified: (user as any).verified,
     };
-    switch (user.role) {
-      case Role.EMPLOYER:
-        // info only an employer has
-        Object.assign(basicInfo, {
-          position: user.managerPosition,
-          company: user.companyName,
-          companyWebsite: user.companyWebsite,
-          vacancies: user.vacancies,
-        });
-        break;
-      case Role.SPECIALIST:
-        // info only a specialist has
-        Object.assign(basicInfo, {
-          education: user.education,
-          status: user.status,
-          birthDate: user.birthDate,
-          citizenship: user.citizenship,
-          resumes: user.resumes,
-        });
-        break;
+
+    if (user.role === Role.EMPLOYER) {
+      Object.assign(basicInfo, {
+        position: (user as any).managerPosition,
+        company: (user as any).companyName,
+        companyWebsite: (user as any).companyWebsite,
+      });
+    } else {
+      Object.assign(basicInfo, {
+        education: (user as any).educations,
+        status: (user as any).status,
+      });
     }
+
     return res.status(206).send({
       success: true,
-      data: {
-        ...basicInfo,
-      },
+      data: basicInfo,
     });
   });
 
