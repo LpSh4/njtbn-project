@@ -22,8 +22,8 @@ export const PostViewProfile = ({ data, type }) => {
 
 
     const userId = isSpecialist
-        ? (data.specialistId || data.specialistid || data.userId || data.authorId)
-        : (data.managerId || data.managerid || data.authorId || data.userId);
+        ? (data.id || data.specialistId || data.specialistid || data.userId || data.authorId)
+        : (data.managerId || data.managerid || data.authorId || data.userId || data.id);
 
     console.log("НАЙДЕННЫЙ ID ДЛЯ ПЕРЕХОДА:", userId);
     console.log("ПЕРЕХОД В ПРОФИЛЬ. ID автора:", userId, "Весь объект:", data);
@@ -33,6 +33,9 @@ export const PostViewProfile = ({ data, type }) => {
         if (userId) navigate(`/profile/${userId}`);
     };
 
+    console.log("=== ДЕБАГ КНОПКИ ПРОФИЛЯ ===");
+    console.log("Роль карточки (isSpecialist):", isSpecialist);
+    console.log("Что пришло в data:", data);
     return (
         <section className="postview-profile">
             <div className="postview-profile__info">
