@@ -27,6 +27,8 @@ import { AuthContext } from "./context/AuthContext";
 
 import {ProfileView} from "./pages/ProfileView/ProfileView.jsx";
 
+import { NotificationsPage } from "./pages/Notifications/NotificationsPage.jsx";
+
 const PublicRoute = ({ user, children }) => {
     if (user) {
         return user.role === "employer"
@@ -86,6 +88,9 @@ const App = () => {
                     <Route path="/vacancy/:id" element={<VacancyView setIsLoginOpen={handleToggleLogin} />} />
                     {}
                     <Route path="/profile/:id" element={<ProfileView/>} />
+
+                    {}
+                    <Route path="/notifications" element={<NotificationsPage />} />
                 </Routes>
             </main>
 

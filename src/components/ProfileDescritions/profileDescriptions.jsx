@@ -17,17 +17,28 @@ export const ProfileDescriptions = () => {
     }, [user]);
 
     const handleSave = async () => {
-        if (description === user?.description) return setIsEdit(false);
+        setError("");
 
-        const res = await updateProfile({ description });
-        if (res.success) {
-            setIsEdit(false);
-            setError("");
-        } else {
-            setError(res.errors?.description || "Failed to update");
+
+        if (description.trim() === (user?.description || "").trim()) {
+            return setIsEdit(false);
+        }
+
+        try {
+            const res = await updateProfile({ description });
+
+
+            if (res && (res.success || res.data || !res.errors)) {
+                setIsEdit(false);
+                setError("");
+            } else {
+                setError(res?.errors?.description || "Failed to update");
+            }
+        } catch (err) {
+            console.error("Ошибка при сохранении описания:", err);
+            setError("Network error. Try again.");
         }
     };
-
     return (
         <section className="description">
             <div className="description__title">

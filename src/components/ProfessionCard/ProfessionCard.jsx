@@ -65,9 +65,7 @@ export const ProfessionCard = ({ data, role }) => {
                 </div>
             </div>
 
-            <div className="card__description">
-                {}
-            </div>
+
         </article>
     );
 };

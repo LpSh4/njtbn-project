@@ -10,6 +10,65 @@
     gap: 16px;
   }
 
+  .header__notif-modal {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 280px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    padding: 15px;
+    z-index: 100;
+    color: #333;
+
+    .notif-modal__header {
+      font-weight: bold;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 10px;
+    }
+
+    .notif-modal__item {
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.2s;
+      &:hover { background: #f5f5f5; }
+      p { margin: 0; font-size: 14px; font-weight: 500; }
+      span { font-size: 12px; color: #888; }
+    }
+
+    .notif-empty { text-align: center; color: #999; padding: 20px 0; }
+
+    button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      border: none;
+      background: #eee;
+      border-radius: 6px;
+      cursor: pointer;
+      &:hover { background: #e2e2e2; }
+    }
+  }
+
+  .notif-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4d4f;
+    color: white;
+    font-size: 10px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
   &__element-cont{
     @include mixins.flex();
    column-gap: 16px;
@@ -107,3 +166,59 @@
   }
 }
 
+.header__notification-container {
+  display: flex;
+  align-items: center;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 50%;
+}
+
+.notif-modal {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 250px;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 15px;
+  z-index: 1000;
+  color: #333;
+
+  h4 { margin-bottom: 10px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+
+  &__list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f9f9f9;
+    cursor: pointer;
+    &:hover { background: #f5f5f5; }
+    p { margin: 0; font-size: 14px; font-weight: bold; }
+    span { font-size: 12px; color: #666; }
+  }
+
+  button {
+    width: 100%;
+    margin-top: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+}

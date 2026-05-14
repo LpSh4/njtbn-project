@@ -75,7 +75,6 @@ export const ProfileProfession = () => {
             } catch (err) {
                 console.error("Ошибка при загрузке контента профиля:", err);
                 setPosts([]);
-                // Если это 404, значит у пользователя просто нет постов (вакансий/резюме)
                 if (err.response?.status !== 404) {
                     setError("Ошибка загрузки данных");
                 }
@@ -100,7 +99,7 @@ export const ProfileProfession = () => {
 
     return (
         <section className="profession">
-            <h2>{targetRole === "specialist" ? "Резюме" : "Вакансии"}</h2>
+            <h2>{targetRole === "specialist" ? "Resume" : "Vacancy"}</h2>
 
             {posts.length === 0 ? (
                 <div className="empty-state">

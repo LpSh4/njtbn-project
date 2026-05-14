@@ -5,7 +5,7 @@
   margin-top: 200px;
   border-top: solid 1px black;
   @include mixins.flex(row, center, center, wrap);
-  @media (max-width:1024px) {
+  @media (max-width:1073px) {
     @include mixins.flex(column);
   }
   &__container {
@@ -14,7 +14,7 @@
     gap: 21px;
     border-right: solid 1px black;
 
-    @media (max-width:1024px) {
+    @media (max-width:1073px) {
       padding-right: 0px;
       @include mixins.flex(column,center,center);
       padding-bottom: 50px;
@@ -26,7 +26,7 @@
       max-width: 372px;
       font-size: 24px;
       color:rgba(000, 000, 000, 0.5);
-      @media (max-width:1024px) {
+      @media (max-width:1073px) {
         text-align: center;
       }
     }
@@ -37,7 +37,7 @@
     padding-left: 78px;
     @include mixins.flex(row,start,start,wrap);
     gap: 78px;
-  @media (max-width:1024px) {
+  @media (max-width:1073px) {
     @include mixins.flex(row,center,center,wrap);
     padding-left:0;
     padding-top:20px;
@@ -52,13 +52,13 @@
 .list-container {
   @include mixins.flex (column,start,start);
   gap: 16px;
-  @media (max-width:1024px) {
+  @media (max-width:1073px) {
     @include mixins.flex (column,center,center);
   }
     &__list{
     @include mixins.flex(column,center,start);
     gap: 10px;
-    @media (max-width:1024px) {
+    @media (max-width:1073px) {
       @include mixins.flex(column,center,center);
     }
     a{

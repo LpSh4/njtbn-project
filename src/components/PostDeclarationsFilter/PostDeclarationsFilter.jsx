@@ -1,5 +1,5 @@
-import "./PostDeclarationsFilter.scss";
 import { useState } from "react";
+import "./PostDeclarationsFilter.scss";
 
 export const PostDeclarationsFilter = ({ onSubmit, type }) => {
     const [filters, setFilters] = useState({
@@ -19,17 +19,22 @@ export const PostDeclarationsFilter = ({ onSubmit, type }) => {
             [name]: value,
         }));
     };
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const payload = {};
-
         Object.keys(filters).forEach(key => {
-            if (filters[key]) {
-                payload[key] = filters[key];
+            if (filters[key] !== "" && filters[key] !== null && filters[key] !== undefined) {
+                if (["salaryFrom", "salaryTo", "expFrom", "expTo"].includes(key)) {
+                    payload[key] = Number(filters[key]);
+                } else {
+                    payload[key] = filters[key];
+                }
             }
         });
+
+        console.log("=== ОТПРАВКА ФИЛЬТРОВ НА СЕРВЕР ===");
+        console.log("Сформированный payload:", payload);
 
         onSubmit(payload);
     };
@@ -52,26 +57,26 @@ export const PostDeclarationsFilter = ({ onSubmit, type }) => {
 
                     <div className="search-filter__input-field">
                         <label>Wage $</label>
-                        {}
                         <div className="search-filter__inputs-row">
-                            <input name="salaryFrom" placeholder="From" type="number" onChange={handleChange} />
-                            <input name="salaryTo" placeholder="To" type="number" onChange={handleChange} />
+                            {}
+                            <input name="salaryFrom" value={filters.salaryFrom} placeholder="From" type="number" onChange={handleChange} />
+                            <input name="salaryTo" value={filters.salaryTo} placeholder="To" type="number" onChange={handleChange} />
                         </div>
                     </div>
 
-                        <div className="search-filter__input-field">
-                            <label>Experience (years)</label>
-
+                    <div className="search-filter__input-field">
+                        <label>Experience (years)</label>
+                        <div className="search-filter__inputs-row">
                             {}
-                            <div className="search-filter__inputs-row">
-                                <input name="expFrom" placeholder="From" type="number" onChange={handleChange} />
-                                <input name="expTo" placeholder="To" type="number" onChange={handleChange} />
-                            </div>
+                            <input name="expFrom" value={filters.expFrom} placeholder="From" type="number" onChange={handleChange} />
+                            <input name="expTo" value={filters.expTo} placeholder="To" type="number" onChange={handleChange} />
                         </div>
+                    </div>
 
                     <p>
                         <label>Job format</label>
-                        <select name="workFormat" onChange={handleChange}>
+                        {}
+                        <select name="workFormat" value={filters.workFormat} onChange={handleChange}>
                             <option value="">Any</option>
                             <option value="remote">Remote</option>
                             <option value="office">Office</option>
@@ -81,8 +86,10 @@ export const PostDeclarationsFilter = ({ onSubmit, type }) => {
 
                     <p className="city">
                         <label>City</label>
+                        {}
                         <input
                             name="city"
+                            value={filters.city}
                             type="text"
                             placeholder="Enter city"
                             onChange={handleChange}
