@@ -92,7 +92,8 @@ export const ProfileProfession = () => {
         <section className="profession">
             <div className="error-message">
                 <h3>{error}</h3>
-                <p>Проверьте правильность ссылки или состояние сервера.</p>
+                <p>
+                    Please check the link is correct or the server status is correct..</p>
             </div>
         </section>
     );
@@ -103,8 +104,8 @@ export const ProfileProfession = () => {
 
             {posts.length === 0 ? (
                 <div className="empty-state">
-                    <h3>Здесь пока пусто</h3>
-                    {isOwnProfile && <p>Создайте вашу первую запись!</p>}
+                    <h3>t's still empty here</h3>
+                    {isOwnProfile && <p>Create your first entry!</p>}
                 </div>
             ) : (
                 <section className="profession__cont">

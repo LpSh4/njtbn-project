@@ -35,8 +35,8 @@ export const ResumeView = () => {
         if (id) fetchResume();
     }, [id]);
 
-    if (error) return <p className="error-404">Резюме не найдено (404)</p>;
-    if (!data) return <p className="loader">Загрузка...</p>;
+    if (error) return <p className="error-404">Resume not found (404)</p>;
+    if (!data) return <p className="loader">Loading...</p>;
 
     return <PostView data={data} type="resume" />;
 };
