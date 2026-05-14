@@ -37,7 +37,7 @@
 
   @media (max-width: 370px) {
     @include mixins.flex(column,start,center);
-    width:299px;
+    width:250px;
     border-radius: 20px;
 
   }

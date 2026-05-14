@@ -21,7 +21,12 @@ export const PostViewProfile = ({ data, type }) => {
     const contactValue = isSpecialist ? (data.status || "Open to work") : (data.name || "Employer");
 
 
-    const userId = data.id || data.specialistid || data.managerid;
+    const userId = isSpecialist
+        ? (data.specialistId || data.specialistid || data.userId || data.authorId)
+        : (data.managerId || data.managerid || data.authorId || data.userId);
+
+    console.log("НАЙДЕННЫЙ ID ДЛЯ ПЕРЕХОДА:", userId);
+    console.log("ПЕРЕХОД В ПРОФИЛЬ. ID автора:", userId, "Весь объект:", data);
     const isProfilePage = location.pathname.includes("/profile");
 
     const handleCheckProfile = () => {

@@ -162,8 +162,8 @@ export const ProfileBasicInfo = () => {
 
                             {user?.role === "employer" && (
                                 <>
-                                    <p><strong>Company:</strong> {user.companyName || "—"}</p>
-                                    <p><strong>Position:</strong> {user.managerPosition || "—"}</p>
+                                    <p><strong>Company:</strong> {user.companyName || user.company}</p>
+                                    <p><strong>Position:</strong> {user.managerPosition || user.position}</p>
                                     {user.companyWebsite && <p><strong>Website:</strong> {user.companyWebsite}</p>}
                                 </>
                             )}

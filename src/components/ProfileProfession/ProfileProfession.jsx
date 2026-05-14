@@ -124,7 +124,7 @@ export const ProfileProfession = () => {
 
             {isOwnProfile && currentRole && (
                 <button className="create-btn" onClick={handleCreate}>
-                    {currentRole === "specialist" ? "Создать резюме" : "Создать вакансию"}
+                    {currentRole === "specialist" ? "Create" : "Create  "}
                 </button>
             )}
         </section>
