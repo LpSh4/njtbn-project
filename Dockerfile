@@ -13,6 +13,6 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm install --only=production
 COPY --from=builder /app/dist ./dist
-
+HEALTHCHECK --interval=1m30s --timeout=10s --retries=2 --start-period=40s --start-interval=5s CMD ["curl", "-f", "http://localhost:3000"]
 EXPOSE 3000
 CMD ["node", "dist/server.js"]
